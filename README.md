@@ -130,7 +130,7 @@ Every bounty requirement, mapped to code, tests and proof, in
 
 - ✅ **Retrieval-layer enforcement, deterministic** — no LLM on the decision path
 - ✅ **Lineage-governed derived memory** — audience = per-source intersection
-- ✅ **In sync with source ACLs under concurrent updates** — permissions are *never cached* on derived memories; every retrieval recomputes effective access directly from current source ACLs, so revocations and ACL changes propagate immediately with no stale-permission window. *Demonstrated* by an interleaved concurrency stress test ([`test/concurrency.test.js`](test/concurrency.test.js): 12,000+ reads against live mutations, zero stale grants)
+- ✅ **In sync with source ACLs under concurrent updates** — permissions are *never cached* on derived memories; every retrieval recomputes effective access directly from current source ACLs. This **deletes the TOCTOU** (Time-of-Check-to-Time-of-Use) class that plagues cache-based RAG permissioning: there is no stale-permission window to exploit. *Demonstrated* by an interleaved concurrency stress test ([`test/concurrency.test.js`](test/concurrency.test.js): 12,000+ reads against live mutations, zero stale grants)
 - ✅ **Regulatory audit** — hash-chained, tamper-evident, HCS-anchored, with timestamps + decision reasons
 - ✅ **Sub-200ms P99** — measured at ~0.38µs
 - ✅ **Bonus: temporal access rules** — "unlock after 30 days"
@@ -156,8 +156,9 @@ docs/           ARCHITECTURE · SECURITY-MODEL · FIELD-NOTES · DEMO-SCRIPT · 
 ```
 
 The browser console, the API server, the tests and the benchmark all import the
-**same** `src/` modules. There is one enforcement implementation, not four — when
-a test passes, the thing on screen is the thing that passed.
+**same** `src/` modules. There is one enforcement implementation, not four — so
+there are **no bypass loops** between what the browser shows and what the server
+enforces. When a test passes, the thing on screen is the thing that passed.
 
 ## API (server-side, same engine)
 
