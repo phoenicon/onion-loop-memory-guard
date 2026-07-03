@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Onion Loop — the library (start here)</title>
-<meta name="description" content="A gentle, illustrated on-ramp to Onion Loop Memory Guard: books on shelves, an AI summary that inherits its books' permissions, and a tamper-evident receipt." />
+<meta name="description" content="A gentle, illustrated on-ramp to Onion Loop Memory Guard: three shelves of books, four readers, AI summaries that inherit their books' permissions, and a tamper-evident receipt." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -16,55 +16,51 @@
     --text-primary:#E7ECF5; --text-secondary:#8A99B0; --text-muted:#586780;
     --text-success:#38BDA0; --bg-success:rgba(56,189,160,.12); --border-success:rgba(56,189,160,.42);
     --text-danger:#E5484D;  --bg-danger:rgba(229,72,77,.12);  --border-danger:rgba(229,72,77,.42);
+    --text-warning:#E0A23B; --bg-warning:rgba(224,162,59,.12); --border-warning:rgba(224,162,59,.42);
     --text-accent:#8B7CF0;  --bg-accent:rgba(139,124,240,.15); --border-accent:rgba(139,124,240,.42);
     --radius:8px;
     --font-sans:'Inter',system-ui,sans-serif; --font-mono:'JetBrains Mono',ui-monospace,monospace;
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--surface-0);color:var(--text-primary);font-family:var(--font-sans);-webkit-font-smoothing:antialiased;line-height:1.5;padding:28px 22px}
-  .page{max-width:1100px;margin:0 auto}
+  .page{max-width:1120px;margin:0 auto}
   .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
   h1{font-family:'Space Grotesk',sans-serif;font-weight:500;font-size:24px;margin:0}
-  .lede{color:var(--text-secondary);font-size:15px;margin:6px 0 2px;max-width:70ch}
+  .lede{color:var(--text-secondary);font-size:15px;margin:6px 0 2px;max-width:74ch}
   .lede b{color:var(--text-primary);font-weight:500}
   .links{margin:10px 0 22px;font-family:var(--font-mono);font-size:13px;color:var(--text-muted)}
   .links a{color:var(--text-accent);text-decoration:none}
   .links a:hover{text-decoration:underline}
   #who button[aria-pressed="true"]{background:var(--bg-accent)!important;color:var(--text-accent)!important}
+  .card{background:var(--surface-2);border:1px solid var(--border);border-left:4px solid var(--border);border-radius:8px;padding:12px}
 </style>
 </head>
 <body>
 <div class="page">
   <h1>🧅 Onion Loop — the library</h1>
-  <p class="lede">The whole idea in one picture. Permissions live on the <b>original books</b>. An AI summary <b>inherits</b> from whichever books it was made from — so if you can't read a book, you can't read a summary of it. Shred a book and its summaries vanish for everyone. Every decision lands in a <b>hash-chained receipt</b> nobody can quietly rewrite.</p>
+  <p class="lede">Permissions live on the <b>original books</b>. An AI summary <b>inherits</b> from whichever books it was made from — so to read a summary you must be allowed to read <b>every</b> book behind it. Shred a book and its summaries vanish for everyone. Every decision lands in a <b>hash-chained receipt</b> nobody can quietly rewrite.</p>
   <div class="links">start here → then see the full <a href="index.html">clearance console</a> · <a href="https://github.com/phoenicon/onion-loop-memory-guard">source on GitHub</a></div>
 
-<h2 class="sr-only">An illustrated library: a shelf of public books and a shelf of board-only books, an AI summary sheet made from one of each, a reader whose access is computed live, a shred button that makes the summary vanish for everyone, and a tamper-evident hash-chained receipt.</h2>
-<div style="display:flex; flex-direction:column; gap:16px; font-family:var(--font-sans);">
+<h2 class="sr-only">An illustrated library with three shelves (public, board-only, engineering), four readers with different clearances, four AI summaries that inherit their source books' permissions, a shred button, and a tamper-evident hash-chained receipt.</h2>
+<div style="display:flex; flex-direction:column; gap:16px;">
 
   <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center;">
     <span style="color:var(--text-secondary); font-size:14px;">Who is asking?</span>
-    <div id="who" role="group" aria-label="Reader" style="display:inline-flex; gap:4px; background:var(--surface-1); border:1px solid var(--border); border-radius:var(--radius); padding:4px;">
-      <button data-who="alice" aria-pressed="true" style="border:0;background:var(--bg-accent);color:var(--text-accent);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:14px;"><i class="ti ti-user" aria-hidden="true"></i> Alice · board</button>
-      <button data-who="carol" aria-pressed="false" style="border:0;background:transparent;color:var(--text-primary);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:14px;"><i class="ti ti-user" aria-hidden="true"></i> Carol · contractor</button>
-    </div>
-    <button id="shred" style="border:1px solid var(--border-danger);background:var(--bg-danger);color:var(--text-danger);padding:7px 12px;border-radius:var(--radius);cursor:pointer;font-size:14px;"><i class="ti ti-flame" aria-hidden="true"></i> <span id="shredlbl">Shred the secret book</span></button>
+    <div id="who" role="group" aria-label="Reader" style="display:inline-flex; gap:4px; background:var(--surface-1); border:1px solid var(--border); border-radius:var(--radius); padding:4px;"></div>
+    <button id="shred" style="border:1px solid var(--border-danger);background:var(--bg-danger);color:var(--text-danger);padding:7px 12px;border-radius:var(--radius);cursor:pointer;font-size:14px;"><i class="ti ti-flame" aria-hidden="true"></i> <span id="shredlbl">Shred the Board deck</span></button>
     <button id="forge" style="border:1px solid var(--border);background:var(--surface-1);color:var(--text-primary);padding:7px 12px;border-radius:var(--radius);cursor:pointer;font-size:14px;"><i class="ti ti-writing" aria-hidden="true"></i> Forge the log</button>
     <button id="reset" style="border:1px solid var(--border);background:var(--surface-1);color:var(--text-secondary);padding:7px 12px;border-radius:var(--radius);cursor:pointer;font-size:14px;"><i class="ti ti-refresh" aria-hidden="true"></i> Reset</button>
+    <span id="reader" style="margin-left:auto;font-size:14px;color:var(--text-secondary);"></span>
   </div>
 
-  <div style="display:grid; grid-template-columns:1.3fr 1fr; gap:16px; align-items:stretch;">
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:start;">
     <div style="border:1px solid var(--border); border-radius:12px; background:var(--surface-1); padding:14px;">
-      <div style="font-size:13px;color:var(--text-success);margin-bottom:6px;"><i class="ti ti-book-2" aria-hidden="true"></i> public shelf — anyone</div>
-      <div id="shelfPub" style="display:flex;align-items:flex-end;gap:6px;min-height:150px;padding:0 4px;"></div>
-      <div style="height:9px;background:var(--border-strong);border-radius:0 0 3px 3px;"></div>
-      <div style="font-size:13px;color:var(--text-danger);margin:14px 0 6px;"><i class="ti ti-lock" aria-hidden="true"></i> board-only shelf</div>
-      <div id="shelfSec" style="display:flex;align-items:flex-end;gap:6px;min-height:150px;padding:0 4px;"></div>
-      <div style="height:9px;background:var(--border-strong);border-radius:0 0 3px 3px;"></div>
+      <div style="font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;">the original books</div>
+      <div id="shelves"></div>
     </div>
-    <div style="display:flex; flex-direction:column; gap:12px;">
-      <div id="reader" style="display:flex;align-items:center;gap:10px;"></div>
-      <div id="sheet" style="position:relative;border:1px solid var(--border);border-left:4px solid var(--border-success);border-radius:8px;background:var(--surface-2);padding:16px;flex:1;overflow:hidden;"></div>
+    <div>
+      <div style="font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;">what the AI made from them</div>
+      <div id="derived" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"></div>
     </div>
   </div>
 
@@ -80,57 +76,92 @@
 
 <script>
 (function(){
-  var GROUPS={alice:['board'],carol:[]},NAME={alice:'Alice',carol:'Carol'},ROLE={alice:'board',carol:'contractor'};
-  var PUB=[{t:'Harvest blog',lab:1,h:146},{t:'Field notes',h:120},{t:'Newsletter',h:134}];
-  var SEC=[{t:'Board deck',lab:1,deck:1,h:142},{t:'Payroll',h:124}];
-  var S={who:'alice',revoked:false,seq:0,prev:'genesis',chain:[]};
+  var PERSONAS={
+    alice:{name:'Alice',role:'board',groups:['board']},
+    dana:{name:'Dana',role:'board + engineering',groups:['board','engineering']},
+    bob:{name:'Bob',role:'engineering',groups:['engineering']},
+    carol:{name:'Carol',role:'contractor',groups:[]}
+  };
+  var ORDER=['alice','dana','bob','carol'];
+  var SRC={
+    blog:{name:'Harvest blog',aud:'any',color:'success'},
+    deck:{name:'Board deck',aud:['board'],color:'danger'},
+    runbook:{name:'Infra runbook',aud:['engineering'],color:'warning'}
+  };
+  var SHELVES=[
+    {aud:'anyone',color:'success',icon:'ti-book-2',label:'public shelf — anyone',books:[{t:'Harvest blog',id:'blog',lab:1,h:146},{t:'Field notes',h:120},{t:'Newsletter',h:134},{t:'Press kit',h:110}]},
+    {aud:'board',color:'danger',icon:'ti-lock',label:'board-only shelf',books:[{t:'Board deck',id:'deck',lab:1,h:142},{t:'Payroll',h:122},{t:'M&A notes',h:130}]},
+    {aud:'engineering',color:'warning',icon:'ti-tool',label:'engineering shelf',books:[{t:'Infra runbook',id:'runbook',lab:1,h:140},{t:'Deploy guide',h:118},{t:'Oncall log',h:128}]}
+  ];
+  var DERIVED=[
+    {id:'S1',name:'Q3 performance',kind:'summary',from:['blog','deck']},
+    {id:'S2',name:'Infra ↔ board note',kind:'note',from:['deck','runbook']},
+    {id:'S3',name:'Runbook digest',kind:'summary',from:['runbook']},
+    {id:'S4',name:'Blog embedding',kind:'embedding',from:['blog']}
+  ];
+  var S={who:'alice',shredded:{},seq:0,prev:'genesis',chain:[]};
+
   function fnv(s){var h=0x811c9dc5;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,0x01000193);}return (h>>>0).toString(16).padStart(8,'0');}
-  function pl(e){return e.seq+'|'+e.who+'|'+e.decision+'|'+e.reason;}
-  function decide(w){return S.revoked?{ok:false,reason:'nobody · shredded'}:{ok:GROUPS[w].indexOf('board')>-1,reason:'board'};}
-  function logD(w){var d=decide(w);S.seq++;var e={seq:S.seq,who:w,decision:d.ok?'GRANT':'DENY',reason:d.reason,prev:S.prev};e.hash=fnv(S.prev+pl(e));S.prev=e.hash;S.chain.push(e);}
-  function verify(){var p='genesis';for(var i=0;i<S.chain.length;i++){var e=S.chain[i];if(e.prev!==p||e.hash!==fnv(p+pl(e)))return{ok:false,at:e.seq};p=e.hash;}return{ok:true};}
+  function pl(e){return e.seq+'|'+e.who+'|'+e.object+'|'+e.decision+'|'+e.reason;}
+  function allowed(id,who){ if(S.shredded[id]) return false; var a=SRC[id].aud; if(a==='any') return true; var g=PERSONAS[who].groups; for(var i=0;i<g.length;i++) if(a.indexOf(g[i])>-1) return true; return false; }
+  function reason(d){ for(var i=0;i<d.from.length;i++) if(S.shredded[d.from[i]]) return 'nobody · source shredded'; var toks=[]; d.from.forEach(function(id){var a=SRC[id].aud; if(a!=='any') toks.push(a.join('/'));}); var u=[]; toks.forEach(function(t){if(u.indexOf(t)<0)u.push(t);}); return u.length?u.join(' ∧ '):'everyone'; }
+  function decide(d,who){ return {ok:d.from.every(function(id){return allowed(id,who);}), reason:reason(d)}; }
+  function logAll(){ DERIVED.forEach(function(d){ var r=decide(d,S.who); S.seq++; var e={seq:S.seq,who:S.who,object:d.id,decision:r.ok?'GRANT':'DENY',reason:r.reason,prev:S.prev}; e.hash=fnv(S.prev+pl(e)); S.prev=e.hash; S.chain.push(e); }); }
+  function verify(){ var p='genesis'; for(var i=0;i<S.chain.length;i++){var e=S.chain[i]; if(e.prev!==p||e.hash!==fnv(p+pl(e))) return {ok:false,at:e.seq}; p=e.hash;} return {ok:true}; }
   var $=function(i){return document.getElementById(i);};
-  function book(b,fam){
-    var shred=fam==='sec'&&b.deck&&S.revoked;
-    var fill=shred?'var(--surface-0)':fam==='pub'?'var(--bg-success)':'var(--bg-danger)';
-    var edge=shred?'var(--border)':fam==='pub'?'var(--border-success)':'var(--border-danger)';
-    var ink=shred?'var(--text-muted)':fam==='pub'?'var(--text-success)':'var(--text-danger)';
-    return '<div style="height:'+b.h+'px;width:'+(b.lab?42:30)+'px;background:'+fill+';border:1px solid '+edge+';border-left:4px solid '+edge+';border-radius:2px 3px 3px 2px;display:flex;align-items:center;justify-content:center;'+(shred?'transform:rotate(86deg) translateY(4px);opacity:.45;':'')+'"><span style="writing-mode:vertical-rl;transform:rotate(180deg);font-size:11px;font-weight:500;color:'+ink+';padding:6px 0;'+(shred?'text-decoration:line-through;':'')+'">'+b.t+'</span></div>';
+
+  function bookHTML(b,shelf){
+    var shred=b.id&&S.shredded[b.id];
+    var fill=shred?'var(--surface-0)':'var(--bg-'+shelf.color+')';
+    var edge=shred?'var(--border)':'var(--border-'+shelf.color+')';
+    var ink=shred?'var(--text-muted)':'var(--text-'+shelf.color+')';
+    return '<div title="'+b.t+'" style="height:'+b.h+'px;width:'+(b.lab?40:28)+'px;background:'+fill+';border:1px solid '+edge+';border-left:4px solid '+edge+';border-radius:2px 3px 3px 2px;display:flex;align-items:center;justify-content:center;'+(shred?'transform:rotate(86deg) translateY(4px);opacity:.45;':'')+'"><span style="writing-mode:vertical-rl;transform:rotate(180deg);font-size:11px;font-weight:500;color:'+ink+';padding:6px 0;white-space:nowrap;'+(shred?'text-decoration:line-through;':'')+'">'+b.t+'</span></div>';
   }
+  function shelfHTML(shelf){
+    return '<div style="font-size:13px;color:var(--text-'+shelf.color+');margin:2px 0 6px;"><i class="ti '+shelf.icon+'" aria-hidden="true"></i> '+shelf.label+'</div>'
+      +'<div style="display:flex;align-items:flex-end;gap:6px;min-height:150px;padding:0 2px;">'+shelf.books.map(function(b){return bookHTML(b,shelf);}).join('')+'</div>'
+      +'<div style="height:9px;background:var(--border-strong);border-radius:0 0 3px 3px;margin-bottom:12px;"></div>';
+  }
+  function cardHTML(d){
+    var r=decide(d,S.who), nm=PERSONAS[S.who].name;
+    var chips=d.from.map(function(id){var src=SRC[id],dead=S.shredded[id];
+      return '<span style="display:inline-flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:11px;color:var(--text-secondary);"><span style="width:8px;height:8px;border-radius:50%;background:'+(dead?'var(--text-muted)':'var(--text-'+src.color+')')+';"></span>'+src.name+(dead?' ✕':'')+'</span>';
+    }).join(' &nbsp; ');
+    var badge=r.ok
+      ?'<span style="display:inline-flex;align-items:center;gap:6px;color:var(--text-success);font-size:13px;"><i class="ti ti-eye"></i> visible</span>'
+      :'<span style="display:inline-flex;align-items:center;gap:6px;color:var(--text-danger);font-size:13px;"><i class="ti ti-eye-off"></i> hidden</span>';
+    return '<div class="card" style="border-left-color:'+(r.ok?'var(--border-success)':'var(--border-danger)')+';">'
+      +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">'
+      +'<div><div style="font-size:14px;color:var(--text-primary);"><i class="ti ti-sparkles" aria-hidden="true" style="color:var(--text-accent);"></i> '+d.name+'</div>'
+      +'<div style="font-size:11px;color:var(--text-muted);margin-top:1px;">'+d.kind+'</div></div>'+badge+'</div>'
+      +'<div style="margin:9px 0;padding:8px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);">'+chips+'</div>'
+      +'<div style="font-size:12px;color:var(--text-secondary);">needs <span style="color:var(--text-primary);">'+r.reason+'</span></div></div>';
+  }
+
   function render(){
-    var kids=$('who').children;
-    for(var i=0;i<kids.length;i++){var on=kids[i].getAttribute('data-who')===S.who;kids[i].setAttribute('aria-pressed',on);kids[i].style.background=on?'var(--bg-accent)':'transparent';kids[i].style.color=on?'var(--text-accent)':'var(--text-primary)';}
-    $('shredlbl').textContent=S.revoked?'Restore the secret book':'Shred the secret book';
-    $('shelfPub').innerHTML=PUB.map(function(b){return book(b,'pub');}).join('');
-    $('shelfSec').innerHTML=SEC.map(function(b){return book(b,'sec');}).join('');
-    var nm=NAME[S.who],d=decide(S.who);
-    $('reader').innerHTML='<div style="width:44px;height:44px;border-radius:50%;background:var(--bg-accent);color:var(--text-accent);display:flex;align-items:center;justify-content:center;font-size:22px;"><i class="ti ti-user"></i></div><div><div style="font-size:15px;color:var(--text-primary);">'+nm+'</div><div style="font-size:13px;color:var(--text-secondary);">clearance: '+ROLE[S.who]+'</div></div>';
-    var gd='<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--text-success);"></span>';
-    var rd='<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+(S.revoked?'var(--text-muted)':'var(--text-danger)')+';"></span>';
-    var lc=d.ok?'var(--border-strong)':'var(--surface-1)';
-    $('sheet').style.borderLeftColor=d.ok?'var(--border-success)':'var(--border-danger)';
-    $('sheet').innerHTML=(d.ok?'':'<span style="position:absolute;top:18px;right:-4px;transform:rotate(9deg);border:2px solid var(--text-danger);color:var(--text-danger);font-size:12px;letter-spacing:.12em;text-transform:uppercase;padding:3px 10px;border-radius:4px;">restricted</span>')
-      +'<div style="font-size:15px;color:var(--text-primary);"><i class="ti ti-sparkles"></i> AI summary sheet</div>'
-      +'<div style="font-size:13px;color:var(--text-secondary);margin-top:2px;">no rule was written on this page</div>'
-      +'<div style="height:7px;border-radius:3px;margin:8px 0;width:88%;background:'+lc+';"></div><div style="height:7px;border-radius:3px;margin:8px 0;width:96%;background:'+lc+';"></div><div style="height:7px;border-radius:3px;margin:8px 0;width:68%;background:'+lc+';"></div>'
-      +'<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-muted);">made from</div>'
-      +'<div style="margin-top:6px;font-family:var(--font-mono);font-size:12px;color:var(--text-secondary);">'+gd+' Harvest blog &nbsp;&nbsp; '+rd+' Board deck'+(S.revoked?' (shredded)':'')+'</div>'
-      +'<div style="margin-top:8px;font-size:14px;color:var(--text-secondary);">rule now: <span style="color:var(--text-primary);">needs '+d.reason+'</span></div>'
-      +(d.ok?'<div style="display:flex;align-items:center;gap:8px;color:var(--text-success);font-size:15px;margin-top:10px;"><i class="ti ti-eye"></i> visible to '+nm+'</div>':'<div style="display:flex;align-items:center;gap:8px;color:var(--text-danger);font-size:15px;margin-top:10px;"><i class="ti ti-eye-off"></i> hidden from '+nm+'</div>');
+    var wb=$('who'); wb.innerHTML=ORDER.map(function(id){var p=PERSONAS[id],on=id===S.who;
+      return '<button data-who="'+id+'" aria-pressed="'+on+'" style="border:0;background:'+(on?'var(--bg-accent)':'transparent')+';color:'+(on?'var(--text-accent)':'var(--text-primary)')+';padding:6px 11px;border-radius:6px;cursor:pointer;font-size:13px;"><i class="ti ti-user" aria-hidden="true"></i> '+p.name+'</button>';
+    }).join('');
+    $('shredlbl').textContent=S.shredded.deck?'Restore the Board deck':'Shred the Board deck';
+    $('shelves').innerHTML=SHELVES.map(shelfHTML).join('');
+    $('derived').innerHTML=DERIVED.map(cardHTML).join('');
+    var vis=DERIVED.filter(function(d){return decide(d,S.who).ok;}).length;
+    $('reader').innerHTML='<b style="color:var(--text-primary);font-weight:500;">'+PERSONAS[S.who].name+'</b> · '+PERSONAS[S.who].role+' — sees '+vis+' of '+DERIVED.length;
     var iv=verify();
     $('integrity').innerHTML=iv.ok?'<i class="ti ti-shield-check"></i> chain intact':'<i class="ti ti-alert-triangle"></i> tampered — breaks at #'+iv.at;
     $('integrity').style.color=iv.ok?'var(--text-success)':'var(--text-danger)';
-    var brAt=iv.ok?1e9:iv.at;
-    var rows=S.chain.slice(-7).reverse();
+    var brAt=iv.ok?1e9:iv.at, rows=S.chain.slice(-8).reverse();
     $('log').innerHTML=rows.map(function(e){var c=e.decision==='GRANT'?'var(--text-success)':'var(--text-danger)';var hc=e.seq>=brAt?'var(--text-danger)':'var(--text-accent)';
-      return '<div style="display:flex;align-items:center;gap:10px;font-family:var(--font-mono);font-size:12px;"><span style="color:var(--text-muted);width:26px;">#'+e.seq+'</span><span style="color:var(--text-secondary);width:46px;">'+NAME[e.who]+'</span><span style="color:'+c+';width:50px;">'+e.decision+'</span><span style="color:var(--text-muted);">prev '+e.prev.slice(0,6)+'</span><i class="ti ti-arrow-right" style="color:var(--text-muted);"></i><span style="color:'+hc+';">'+e.hash+(e.forged?' ✗':'')+'</span></div>';
+      return '<div style="display:flex;align-items:center;gap:10px;font-family:var(--font-mono);font-size:12px;"><span style="color:var(--text-muted);width:26px;">#'+e.seq+'</span><span style="color:var(--text-secondary);width:44px;">'+PERSONAS[e.who].name+'</span><span style="color:var(--text-secondary);width:34px;">'+e.object+'</span><span style="color:'+c+';width:50px;">'+e.decision+'</span><span style="color:var(--text-muted);">prev '+e.prev.slice(0,6)+'</span><i class="ti ti-arrow-right" style="color:var(--text-muted);"></i><span style="color:'+hc+';">'+e.hash+(e.forged?' ✗':'')+'</span></div>';
     }).join('');
   }
-  $('who').addEventListener('click',function(ev){var b=ev.target.closest('button');if(!b)return;S.who=b.getAttribute('data-who');logD(S.who);render();});
-  $('shred').addEventListener('click',function(){S.revoked=!S.revoked;logD(S.who);render();});
-  $('forge').addEventListener('click',function(){if(S.chain.length<2){logD('carol');}var t=S.chain[Math.floor(S.chain.length/2)];t.decision=t.decision==='GRANT'?'DENY':'GRANT';t.forged=1;render();});
-  $('reset').addEventListener('click',function(){S={who:'alice',revoked:false,seq:0,prev:'genesis',chain:[]};logD('alice');render();});
-  logD('alice');render();
+
+  $('who').addEventListener('click',function(ev){var b=ev.target.closest('button');if(!b)return;S.who=b.getAttribute('data-who');logAll();render();});
+  $('shred').addEventListener('click',function(){S.shredded.deck=!S.shredded.deck;logAll();render();});
+  $('forge').addEventListener('click',function(){if(S.chain.length<2){logAll();}var t=S.chain[Math.floor(S.chain.length/2)];t.decision=t.decision==='GRANT'?'DENY':'GRANT';t.forged=1;render();});
+  $('reset').addEventListener('click',function(){S={who:'alice',shredded:{},seq:0,prev:'genesis',chain:[]};logAll();render();});
+
+  logAll(); render();
 })();
 </script>
 </body>
