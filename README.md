@@ -198,7 +198,9 @@ uncleared viewer, over HTTP.
 
 Zero dependencies, so hosting is trivial — any Node host works.
 
-- **Render** (one click): New **+** → **Blueprint** → connect this repo. [`render.yaml`](render.yaml) does the rest; health check at `/api/health`.
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/phoenicon/onion-loop-memory-guard)
+
+- **Render** (one click): use the button above, or New **+** → **Blueprint** → connect this repo. [`render.yaml`](render.yaml) does the rest; health check at `/api/health`.
 - **Anything with Node** (Railway / Fly / a VPS): `npm start` (serves the console, library, and API on `$PORT`).
 - **Static only** (GitHub Pages / any web space): the [library](web/library.html) and [console](web/index.html) run fully in the browser — no server needed. Only the `/api/*` routes require a Node host.
 - **Embeddings**: local + zero-key by default; set `OPENAI_API_KEY` for `text-embedding-3-small`.
