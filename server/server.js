@@ -28,7 +28,7 @@ import { check } from '../src/engine.js';
 import { redactedView, auditLeaks, reconstructionAudit } from '../src/inference.js';
 import { audienceToString } from '../src/audience.js';
 import { createLedger, record, entries, verifyChain, p99 } from '../src/audit.js';
-import { embed, embedderName, VectorStore } from '../src/vector.js';
+import { embed, embedLocal, embedderName, VectorStore } from '../src/vector.js';
 import { demoCorpus, CLOCK, nodeName } from '../src/demo-corpus.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -43,10 +43,24 @@ const ledger = createLedger();
 const corpus = demoCorpus();
 const store = new VectorStore();
 let vectorReady = false;
+let activeEmbed = embed;              // the embedder the whole server actually uses
+let activeName = embedderName();
 (async () => {
-  for (const id of Object.keys(corpus.text)) store.add(id, await embed(corpus.text[id]), { id });
+  // If a key is set, probe it once. If it fails, fall back to the local embedder
+  // for EVERYTHING (keeps vector dimensions consistent) — a bad key can never
+  // break the live demo.
+  if (process.env.OPENAI_API_KEY) {
+    try {
+      await embed('probe');
+    } catch (e) {
+      activeEmbed = (t) => Promise.resolve(embedLocal(t));
+      activeName = 'local:hashed-3gram-256d (OpenAI unavailable)';
+      console.warn('  OpenAI embeddings unavailable — using local embedder:', e.message);
+    }
+  }
+  for (const id of Object.keys(corpus.text)) store.add(id, await activeEmbed(corpus.text[id]), { id });
   vectorReady = true;
-  console.log(`  vector index ready · ${store.items.length} memories · embedder ${embedderName()}`);
+  console.log(`  vector index ready · ${store.items.length} memories · embedder ${activeName}`);
 })();
 
 const MIME = {
@@ -108,7 +122,7 @@ async function search(res, personaId, query) {
   const persona = corpus.personas[personaId];
   if (!persona) return json(res, 400, { error: `unknown persona '${personaId}'`, personas: Object.keys(corpus.personas) });
   const q = (query || 'what was the harvest budget decision?').slice(0, 400);
-  const hits = store.search(await embed(q), 5);
+  const hits = store.search(await activeEmbed(q), 5);
   const gated = hits.map((h) => {
     const r = check(corpus.graph, h.id, persona, CLOCK);
     record(ledger, { clock: CLOCK, principal: persona.name, object: h.id, decision: r.decision, rule: r.rule, latencyMs: r.latencyMs });
@@ -116,7 +130,7 @@ async function search(res, personaId, query) {
   });
   json(res, 200, {
     query: q,
-    embedder: embedderName(),
+    embedder: activeName,
     viewer: { id: persona.id, name: persona.name, role: persona.role },
     note: 'relevance found these; the engine decided which the viewer may see',
     ranked: gated,
