@@ -1,0 +1,14 @@
+# One-click deploy to Render → https://render.com
+# New + → Blueprint → connect this repo. Zero dependencies, so the build is instant.
+services:
+  - type: web
+    name: onion-loop-memory-guard
+    runtime: node
+    plan: free
+    buildCommand: "" # nothing to build — pure Node stdlib
+    startCommand: node server/server.js
+    healthCheckPath: /api/health
+    envVars:
+      # Optional: set to use OpenAI embeddings instead of the local embedder.
+      - key: OPENAI_API_KEY
+        sync: false

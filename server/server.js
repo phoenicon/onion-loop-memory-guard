@@ -14,6 +14,7 @@
  *   GET  /api/scenario          → sources + derived + persona roster
  *   GET  /api/retrieve?as=carol → deterministic redacted view for a persona
  *   GET  /api/audit             → server-side ledger + chain verification + P99
+ *   GET  /api/search?as=carol&q=… → REAL embedding + cosine search, then gated
  *
  * Run:  npm run demo   (or: node server/server.js)
  */
@@ -27,6 +28,8 @@ import { check } from '../src/engine.js';
 import { redactedView, auditLeaks, reconstructionAudit } from '../src/inference.js';
 import { audienceToString } from '../src/audience.js';
 import { createLedger, record, entries, verifyChain, p99 } from '../src/audit.js';
+import { embed, embedderName, VectorStore } from '../src/vector.js';
+import { demoCorpus, CLOCK, nodeName } from '../src/demo-corpus.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PORT = Number(process.env.PORT) || 4173;
@@ -35,6 +38,16 @@ const bootTime = Date.now();
 // One long-lived server-side world + audit ledger.
 const world = freshScenario();
 const ledger = createLedger();
+
+// A real vector index over the demo corpus, built once at boot.
+const corpus = demoCorpus();
+const store = new VectorStore();
+let vectorReady = false;
+(async () => {
+  for (const id of Object.keys(corpus.text)) store.add(id, await embed(corpus.text[id]), { id });
+  vectorReady = true;
+  console.log(`  vector index ready · ${store.items.length} memories · embedder ${embedderName()}`);
+})();
 
 const MIME = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
@@ -89,6 +102,29 @@ function audit(res) {
   json(res, 200, { entries: entries(ledger).slice(0, 50), chain: verifyChain(ledger), p99Ms: p99(ledger), count: ledger.seq });
 }
 
+/** GET /api/search?as=<persona>&q=<query> — real embedding + cosine search, then gated. */
+async function search(res, personaId, query) {
+  if (!vectorReady) return json(res, 503, { error: 'vector index warming up, retry shortly' });
+  const persona = corpus.personas[personaId];
+  if (!persona) return json(res, 400, { error: `unknown persona '${personaId}'`, personas: Object.keys(corpus.personas) });
+  const q = (query || 'what was the harvest budget decision?').slice(0, 400);
+  const hits = store.search(await embed(q), 5);
+  const gated = hits.map((h) => {
+    const r = check(corpus.graph, h.id, persona, CLOCK);
+    record(ledger, { clock: CLOCK, principal: persona.name, object: h.id, decision: r.decision, rule: r.rule, latencyMs: r.latencyMs });
+    return { id: h.id, name: nodeName(corpus.graph, h.id), score: +h.score.toFixed(4), decision: r.decision, rule: r.rule };
+  });
+  json(res, 200, {
+    query: q,
+    embedder: embedderName(),
+    viewer: { id: persona.id, name: persona.name, role: persona.role },
+    note: 'relevance found these; the engine decided which the viewer may see',
+    ranked: gated,
+    toLLM: gated.filter((g) => g.decision === 'GRANT').map((g) => g.id),
+    blocked: gated.filter((g) => g.decision === 'DENY').map((g) => ({ id: g.id, rule: g.rule })),
+  });
+}
+
 async function serveStatic(res, urlPath) {
   const rel = normalize(decodeURIComponent(urlPath)).replace(/^(\.\.[/\\])+/, '');
   let filePath = join(ROOT, rel);
@@ -111,6 +147,7 @@ const server = createServer(async (req, res) => {
   if (p === '/api/health') return json(res, 200, { ok: true, uptimeMs: Date.now() - bootTime });
   if (p === '/api/scenario') return scenario(res);
   if (p === '/api/retrieve') return retrieve(res, url.searchParams.get('as') || world.defaultPersona);
+  if (p === '/api/search') return search(res, url.searchParams.get('as') || 'carol', url.searchParams.get('q') || '');
   if (p === '/api/audit') return audit(res);
   return serveStatic(res, p === '/' ? '/web/index.html' : p);
 });

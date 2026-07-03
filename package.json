@@ -9,6 +9,7 @@
   },
   "files": ["src"],
   "scripts": {
+    "start": "node server/server.js",
     "demo": "node server/server.js",
     "eli5": "node examples/eli5.js",
     "vector": "node examples/vector-gate.js",

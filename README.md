@@ -184,10 +184,24 @@ enforces. When a test passes, the thing on screen is the thing that passed.
 ## API (server-side, same engine)
 
 ```bash
-curl "http://localhost:4173/api/retrieve?as=carol"   # deterministic redacted view for a persona
-curl "http://localhost:4173/api/audit"               # ledger + chain verification + P99
-curl "http://localhost:4173/api/scenario"            # sources, derived memories, personas
+curl "http://localhost:4173/api/retrieve?as=carol"                 # deterministic redacted view for a persona
+curl "http://localhost:4173/api/search?as=carol&q=harvest+budget"  # REAL embedding + cosine search, then gated
+curl "http://localhost:4173/api/audit"                             # ledger + chain verification + P99
+curl "http://localhost:4173/api/scenario"                          # sources, derived memories, personas
 ```
+
+`/api/search` embeds the query, runs a real nearest-neighbour search, and gates
+the hits — so you can watch a confidential doc rank #1 yet never reach an
+uncleared viewer, over HTTP.
+
+## Deploy (run it online)
+
+Zero dependencies, so hosting is trivial — any Node host works.
+
+- **Render** (one click): New **+** → **Blueprint** → connect this repo. [`render.yaml`](render.yaml) does the rest; health check at `/api/health`.
+- **Anything with Node** (Railway / Fly / a VPS): `npm start` (serves the console, library, and API on `$PORT`).
+- **Static only** (GitHub Pages / any web space): the [library](web/library.html) and [console](web/index.html) run fully in the browser — no server needed. Only the `/api/*` routes require a Node host.
+- **Embeddings**: local + zero-key by default; set `OPENAI_API_KEY` for `text-embedding-3-small`.
 
 ---
 
