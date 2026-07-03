@@ -35,6 +35,11 @@ breath.
 <img src="docs/screenshots/onion-loop-poster.png" alt="Onion Loop Memory Guard — overview and architecture" width="880">
 </div>
 
+> 📚 **New here? Start with the library.** Open [`web/library.html`](web/library.html)
+> in a browser (it's self-contained — no install) for a 30-second, illustrated
+> walkthrough: public books, a secret book, an AI summary that inherits their
+> permissions, and a tamper-evident receipt. Then dive into the technical console.
+
 ---
 
 ## Quickstart — one command
