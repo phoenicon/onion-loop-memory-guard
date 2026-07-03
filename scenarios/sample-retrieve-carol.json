@@ -1,0 +1,63 @@
+{
+  "viewer": {
+    "id": "carol",
+    "name": "Carol",
+    "role": "Contractor",
+    "groups": []
+  },
+  "enforcement": "deterministic · 0 LLM calls",
+  "decisions": [
+    {
+      "id": "MEM-01",
+      "decision": "DENY",
+      "rule": "ReBAC ∧ requires board",
+      "latencyMs": 0.13154200001736172
+    },
+    {
+      "id": "MEM-02",
+      "decision": "GRANT",
+      "rule": "ReBAC ∧ requires everyone",
+      "latencyMs": 0.010041000001365319
+    },
+    {
+      "id": "MEM-03",
+      "decision": "DENY",
+      "rule": "ReBAC ∧ requires board ∧ engineering",
+      "latencyMs": 0.008749999979045242
+    },
+    {
+      "id": "MEM-04",
+      "decision": "DENY",
+      "rule": "temporal: source locked → ∅",
+      "latencyMs": 0.02770899998722598
+    }
+  ],
+  "redactedView": [
+    {
+      "id": "MEM-01",
+      "visible": false
+    },
+    {
+      "id": "MEM-02",
+      "visible": true,
+      "name": "Embedding · harvest blog",
+      "kind": "embedding",
+      "lineage": [
+        "SRC-02"
+      ]
+    },
+    {
+      "id": "MEM-03",
+      "visible": false
+    },
+    {
+      "id": "MEM-04",
+      "visible": false
+    }
+  ],
+  "inferenceGuard": {
+    "safe": true,
+    "leaks": []
+  },
+  "p99Ms": 0.13154200001736172
+}

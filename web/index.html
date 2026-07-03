@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Onion Loop Memory Guard · Clearance Console</title>
+<meta name="description" content="Deterministic, lineage-governed, permission-aware memory for AI agents. Enforcement at the retrieval layer — no LLM on the decision path." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0B0F17; --panel:#121826; --panel2:#0E1420; --raise:#182032;
+    --line:#223047; --line-soft:#1a2537;
+    --text:#E7ECF5; --muted:#8A99B0; --faint:#586780;
+    --pub:#38BDA0; --int:#E0A23B; --conf:#E5484D; --violet:#8B7CF0;
+    --grant:#38BDA0; --deny:#6B7688;
+    --stamp:#E5484D;
+    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:'Space Grotesk',system-ui,sans-serif;
+    --body:'Inter',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(139,124,240,.10), transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, rgba(56,189,160,.07), transparent 55%),
+      var(--ink);
+    color:var(--text); font-family:var(--body);
+    -webkit-font-smoothing:antialiased; line-height:1.45;
+    padding:24px; min-height:100vh;
+  }
+  .wrap{max-width:1220px;margin:0 auto}
+
+  /* header */
+  header.top{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:20px}
+  .brand h1{font-family:var(--disp);font-weight:600;font-size:23px;letter-spacing:-.01em;margin:0}
+  .brand .sub{color:var(--muted);font-size:13px;margin-top:5px;max-width:52ch}
+  .brand .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+
+  /* persona switcher */
+  .viewer{display:flex;flex-direction:column;gap:7px;align-items:flex-end}
+  .viewer .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+  .personas{display:flex;gap:6px;background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:5px}
+  .persona{appearance:none;border:0;background:transparent;color:var(--muted);font-family:var(--body);font-weight:500;font-size:12.5px;padding:7px 11px;border-radius:8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:64px;transition:.14s}
+  .persona small{font-family:var(--mono);font-size:9px;letter-spacing:.08em;color:var(--faint)}
+  .persona[aria-pressed="true"]{background:var(--raise);color:var(--text);box-shadow:inset 0 0 0 1px var(--violet)}
+  .persona[aria-pressed="true"] small{color:var(--violet)}
+  .persona:hover{color:var(--text)}
+  .persona:focus-visible{outline:2px solid var(--violet);outline-offset:2px}
+
+  /* stat strip */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+  .stat{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+  .stat .k{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+  .stat .v{font-family:var(--disp);font-weight:600;font-size:21px;margin-top:5px;display:flex;align-items:baseline;gap:6px}
+  .stat .v small{font-size:11px;color:var(--muted);font-family:var(--mono);font-weight:400}
+  .ok{color:var(--pub)}
+
+  /* columns */
+  .grid{display:grid;grid-template-columns:1fr 1fr 380px;gap:16px;align-items:start}
+  .col{min-width:0}
+  .colhead{display:flex;align-items:center;justify-content:space-between;margin:0 2px 11px}
+  .colhead h2{font-family:var(--disp);font-weight:600;font-size:13px;letter-spacing:.02em;margin:0;text-transform:uppercase}
+  .colhead .note{font-family:var(--mono);font-size:10px;color:var(--faint);letter-spacing:.05em}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:14px;margin-bottom:11px;position:relative;overflow:hidden;transition:opacity .2s, filter .2s, transform .2s}
+  .card .row1{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+  .card .name{font-family:var(--disp);font-weight:500;font-size:14.5px;letter-spacing:-.01em}
+  .card .id{font-family:var(--mono);font-size:9.5px;color:var(--faint);letter-spacing:.08em;margin-bottom:3px}
+  .derived{border-style:dashed;border-color:#2c3550}
+  .derived::after{content:"COMPUTED";position:absolute;top:11px;right:-30px;transform:rotate(45deg);background:var(--violet);color:#0b0f17;font-family:var(--mono);font-size:8px;font-weight:600;letter-spacing:.1em;padding:2px 34px}
+
+  .chip{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.05em;padding:3px 8px;border-radius:6px;white-space:nowrap}
+  .chip.pub{color:var(--pub);background:rgba(56,189,160,.11);box-shadow:inset 0 0 0 1px rgba(56,189,160,.3)}
+  .chip.int{color:var(--int);background:rgba(224,162,59,.11);box-shadow:inset 0 0 0 1px rgba(224,162,59,.3)}
+  .chip.conf{color:var(--conf);background:rgba(229,72,77,.12);box-shadow:inset 0 0 0 1px rgba(229,72,77,.32)}
+  .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+
+  .aud{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+  .aud .g{font-family:var(--mono);font-size:10px;color:var(--muted);background:var(--panel2);border:1px solid var(--line-soft);border-radius:5px;padding:2px 7px}
+  .aud .g.uni{color:var(--pub)}
+  .aud .g.none{color:var(--conf)}
+
+  .lineage{margin-top:11px;padding-top:10px;border-top:1px solid var(--line-soft)}
+  .lineage .l-lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+  .l-chips{display:flex;flex-wrap:wrap;gap:5px}
+  .l-src{font-family:var(--mono);font-size:10px;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:2px 7px;display:inline-flex;align-items:center;gap:5px}
+  .l-src .s-dot{width:5px;height:5px;border-radius:50%}
+  .l-src.gone{color:var(--conf);border-color:rgba(229,72,77,.4);text-decoration:line-through;opacity:.7}
+  .why{font-size:11.5px;color:var(--muted);margin-top:9px;font-family:var(--mono);line-height:1.5}
+  .why b{color:var(--text);font-weight:500}
+
+  .verdict{display:flex;align-items:center;gap:7px;margin-top:11px;font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.04em}
+  .verdict.grant{color:var(--grant)}
+  .verdict.deny{color:var(--deny)}
+  .verdict svg{width:14px;height:14px}
+
+  /* revoke control */
+  .revoke{appearance:none;font-family:var(--mono);font-size:10px;letter-spacing:.06em;border:1px solid var(--line);background:var(--panel2);color:var(--muted);border-radius:7px;padding:5px 9px;cursor:pointer;transition:.14s}
+  .revoke:hover{border-color:var(--conf);color:var(--conf)}
+  .revoke:focus-visible{outline:2px solid var(--conf);outline-offset:2px}
+  .revoke.active{background:rgba(229,72,77,.14);border-color:var(--conf);color:var(--conf)}
+
+  /* redaction stamp */
+  .card.hidden-view{opacity:.4;filter:grayscale(.5)}
+  .redacted{position:absolute;inset:0;background:repeating-linear-gradient(-45deg,rgba(229,72,77,.05) 0 12px,transparent 12px 24px);display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0}
+  .redacted .word{font-family:var(--disp);font-weight:700;font-size:19px;letter-spacing:.22em;color:var(--stamp);border:3px solid var(--stamp);border-radius:6px;padding:5px 16px;transform:rotate(-9deg) scale(1.6);opacity:0}
+  .card.revoked-hit .redacted{opacity:1}
+  .card.revoked-hit .redacted .word{animation:slam .5s cubic-bezier(.2,1.3,.3,1) forwards}
+  @keyframes slam{0%{transform:rotate(-9deg) scale(1.9);opacity:0}55%{opacity:1}100%{transform:rotate(-9deg) scale(1);opacity:.92}}
+  @media (prefers-reduced-motion: reduce){
+    .card.revoked-hit .redacted .word{animation:none;transform:rotate(-9deg) scale(1);opacity:.92}
+  }
+
+  /* audit ledger */
+  .ledger{background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:0;overflow:hidden}
+  .ledger .lh{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line)}
+  .ledger .lh .t{font-family:var(--disp);font-weight:600;font-size:12px;letter-spacing:.04em;text-transform:uppercase}
+  .ledger .lh .p99{font-family:var(--mono);font-size:10px;color:var(--pub);letter-spacing:.05em}
+  .log{max-height:560px;overflow-y:auto;padding:8px}
+  .log::-webkit-scrollbar{width:8px}
+  .log::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+  .entry{font-family:var(--mono);font-size:10.5px;line-height:1.5;padding:8px 9px;border-radius:8px;margin-bottom:5px;background:var(--panel);border:1px solid var(--line-soft)}
+  .entry .e1{display:flex;justify-content:space-between;gap:8px;color:var(--faint)}
+  .entry .dec{font-weight:600}
+  .entry .dec.GRANT{color:var(--grant)}
+  .entry .dec.DENY{color:var(--conf)}
+  .entry .e2{color:var(--text);margin-top:2px}
+  .entry .rule{color:var(--muted)}
+  .entry .hash{color:var(--faint);font-size:9px;margin-top:3px;display:flex;gap:6px;align-items:center}
+  .entry .hash .h{color:var(--violet)}
+  .anchor{font-family:var(--mono);font-size:10px;color:var(--pub);background:rgba(56,189,160,.07);border:1px dashed rgba(56,189,160,.35);border-radius:8px;padding:7px 9px;margin-bottom:5px;display:flex;gap:7px;align-items:center}
+
+  /* temporal control */
+  .clockbar{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:11px 14px;margin-bottom:16px;flex-wrap:wrap}
+  .clockbar .ct{font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .clockbar .ct b{color:var(--text)}
+  .btn{appearance:none;font-family:var(--mono);font-size:11px;letter-spacing:.04em;border:1px solid var(--line);background:var(--raise);color:var(--text);border-radius:8px;padding:7px 12px;cursor:pointer;transition:.14s}
+  .btn:hover{border-color:var(--violet)}
+  .btn:focus-visible{outline:2px solid var(--violet);outline-offset:2px}
+  .btn.ghost{background:transparent;color:var(--muted)}
+
+  footer.arch{margin-top:22px;border-top:1px solid var(--line);padding-top:16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+  .arch .flow{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.02em}
+  .arch .flow b{color:var(--text)}
+  .arch .flow .sep{color:var(--faint);margin:0 6px}
+  .arch .pill{font-family:var(--mono);font-size:10px;color:var(--violet);border:1px solid rgba(139,124,240,.35);background:rgba(139,124,240,.08);border-radius:20px;padding:5px 11px}
+  .src-badge{font-family:var(--mono);font-size:10px;color:var(--faint);letter-spacing:.04em}
+  .src-badge b{color:var(--pub)}
+
+  @media (max-width:980px){
+    .grid{grid-template-columns:1fr}
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .ledger .log{max-height:360px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">
+      <div class="tag">Onion Loop Memory Guard · retrieval-layer enforcement</div>
+      <h1>Lineage-Governed Memory</h1>
+      <div class="sub">Access is <em>computed</em> from the source graph at read time — never copied onto memories, never decided by an LLM. Revoke a source and every derivative recomputes in the same breath.</div>
+    </div>
+    <div class="viewer">
+      <div class="lbl">Retrieving as</div>
+      <div class="personas" role="group" aria-label="Viewer identity"></div>
+    </div>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><div class="k">Enforcement path</div><div class="v ok">Deterministic <small>0 LLM calls</small></div></div>
+    <div class="stat"><div class="k">P99 permission check</div><div class="v"><span id="p99">—</span><small>budget 200ms</small></div></div>
+    <div class="stat"><div class="k">Visible to viewer</div><div class="v"><span id="visct">—</span><small id="vistot">of —</small></div></div>
+    <div class="stat"><div class="k">Audit ledger</div><div class="v"><span id="entct">0</span><small id="chainstat">hash-chained ✓</small></div></div>
+  </div>
+
+  <div class="clockbar">
+    <span class="ct">Ledger clock: <b id="clock">—</b></span>
+    <button class="btn" id="advance">Advance +30 days</button>
+    <button class="btn ghost" id="reset">Reset scenario</button>
+    <span class="src-badge" id="srcbadge" style="margin-left:auto">engine · <b>in-browser</b></span>
+    <span class="ct">Temporal rule live: <b>SRC-04 unlocks after 30d</b></span>
+  </div>
+
+  <div class="grid">
+    <div class="col">
+      <div class="colhead"><h2>Sources · ACL'd</h2><span class="note">classified @ write-time</span></div>
+      <div id="sources"></div>
+    </div>
+    <div class="col">
+      <div class="colhead"><h2>Derived memory</h2><span class="note">access inherited by lineage</span></div>
+      <div id="derived"></div>
+    </div>
+    <div class="col">
+      <div class="ledger">
+        <div class="lh"><span class="t">Audit ledger</span><span class="p99" id="chainstatus">chain intact ✓</span></div>
+        <div class="log" id="log"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="arch">
+    <div class="flow">
+      <b>write path</b> LLM classify <span class="sep">→</span> ACL relations
+      <span class="sep">‖</span>
+      <b>read path</b> resolve groups <span class="sep">→</span> graph check <span class="sep">→</span> vector filter <span class="sep">→</span> bulk verify
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <span class="pill">SpiceDB-style ReBAC</span>
+      <span class="pill">high-water-mark lineage</span>
+      <span class="pill">HCS-anchored audit</span>
+    </div>
+  </footer>
+</div>
+
+<!--
+  The whole UI is a thin skin over the SAME engine the tests and benchmark use.
+  Zero build step: native ES modules import the source directly.
+-->
+<script type="module">
+import {
+  freshScenario, EPOCH,
+  effectiveAudience, resolve, canRead, requirementString, check, LEVELS,
+  audienceToString,
+  createLedger, record, entries as ledgerEntries, verifyChain, p99 as ledgerP99,
+} from '../src/index.js';
+
+const LEVELCLS = ['pub','int','conf'];
+const $ = (s, r = document) => r.querySelector(s);
+const iconGrant = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l4 4 10-10"/></svg>';
+const iconDeny  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+const fmtLat = (ms) => ms >= 1 ? ms.toFixed(1) + 'ms' : ms > 0 ? (ms * 1000).toFixed(1) + 'µs' : '<1µs';
+
+/* ---------- mutable UI state (the engine itself is pure) ---------- */
+let S;
+function boot() {
+  const sc = freshScenario();
+  S = { ...sc, personaId: sc.defaultPersona, clock: new Date(sc.epoch), ledger: createLedger() };
+}
+boot();
+
+/* ---------- audit: one deterministic check per memory for the current viewer ---------- */
+function auditForViewer() {
+  const persona = S.personas[S.personaId];
+  for (const id of Object.keys(S.graph.derived)) {
+    const r = check(S.graph, id, persona, S.clock);
+    record(S.ledger, { clock: S.clock, principal: persona.name, object: id, decision: r.decision, rule: r.rule, latencyMs: r.latencyMs });
+  }
+}
+
+/* ---------- render: personas ---------- */
+function renderPersonas() {
+  const box = $('.personas'); box.innerHTML = '';
+  for (const id of Object.keys(S.personas)) {
+    const p = S.personas[id];
+    const b = document.createElement('button');
+    b.className = 'persona'; b.setAttribute('aria-pressed', id === S.personaId);
+    b.innerHTML = `${p.name}<small>${p.role}</small>`;
+    b.onclick = () => { S.personaId = id; recompute('switch'); };
+    box.appendChild(b);
+  }
+}
+
+function audienceChips(eff) {
+  if (eff.state === 'revoked') return `<span class="g none">access revoked → ∅</span>`;
+  if (eff.state === 'locked')  return `<span class="g none">time-locked → ∅</span>`;
+  if (eff.audience.universal)  return `<span class="g uni">everyone</span>`;
+  if (eff.audience.groups.size === 0) return `<span class="g none">∅ nobody</span>`;
+  return [...eff.audience.groups].map((g) => `<span class="g">${g}</span>`).join('');
+}
+
+function reqChip(r) {
+  if (r.revoked) return `<span class="g none">access revoked → ∅</span>`;
+  if (r.locked)  return `<span class="g none">time-locked → ∅</span>`;
+  const s = requirementString(r);
+  if (s === 'everyone') return `<span class="g uni">everyone</span>`;
+  return `<span class="g" style="color:var(--violet)">requires ${s}</span>`;
+}
+
+/* ---------- render: sources ---------- */
+function renderSources() {
+  const box = $('#sources'); box.innerHTML = '';
+  for (const id of Object.keys(S.graph.sources)) {
+    const src = S.graph.sources[id];
+    const eff = effectiveAudience(src, S.clock, S.graph.epoch);
+    const lvlcls = LEVELCLS[src.level];
+    const lockTxt = src.unlockDays > 0 ? ` · unlocks +${src.unlockDays}d` : '';
+    const card = document.createElement('div');
+    card.className = 'card'; card.id = 'card-' + id;
+    card.innerHTML = `
+      <div class="row1">
+        <div><div class="id">${id}${lockTxt}</div><div class="name">${src.name}</div></div>
+        <span class="chip ${lvlcls}"><span class="dot"></span>${LEVELS[src.level]}</span>
+      </div>
+      <div class="aud">${audienceChips(eff)}</div>
+      <div style="margin-top:11px">
+        <button class="revoke ${src.revoked ? 'active' : ''}" data-src="${id}">
+          ${src.revoked ? '✕ access revoked — restore' : 'revoke access'}
+        </button>
+      </div>`;
+    box.appendChild(card);
+  }
+  box.querySelectorAll('.revoke').forEach((b) => {
+    b.onclick = () => { const sid = b.dataset.src; S.graph.sources[sid].revoked = !S.graph.sources[sid].revoked; recompute(S.graph.sources[sid].revoked ? 'revoke' : 'restore', sid); };
+  });
+}
+
+function whyLine(r) {
+  const parts = r.reqs.map((req) => {
+    if (req.state === 'revoked') return `${req.id}:∅`;
+    if (req.state === 'locked')  return `${req.id}:locked`;
+    return `${req.id}:` + audienceToString(req.audience);
+  });
+  return `read iff <b>∧</b> ( ${parts.join('  ∧  ')} ) &nbsp;⇒&nbsp; requires <b>${requirementString(r)}</b>`;
+}
+
+/* ---------- render: derived ---------- */
+let prevHiddenFromRevoke = new Set();
+function renderDerived(changedSrc) {
+  const box = $('#derived'); box.innerHTML = '';
+  const persona = S.personas[S.personaId];
+  for (const id of Object.keys(S.graph.derived)) {
+    const m = S.graph.derived[id];
+    const r = resolve(S.graph, id, S.clock);
+    const allowed = canRead(r, persona);
+    const lvlcls = LEVELCLS[r.level];
+    const card = document.createElement('div');
+    card.className = 'card derived' + (allowed ? '' : ' hidden-view');
+    card.id = 'card-' + id;
+
+    const srcChips = m.from.map((p) => {
+      const src = S.graph.sources[p];
+      const gone = src && src.revoked;
+      const color = src ? ['#38BDA0','#E0A23B','#E5484D'][src.level] : '#8B7CF0';
+      return `<span class="l-src ${gone ? 'gone' : ''}"><span class="s-dot" style="background:${color}"></span>${p}</span>`;
+    }).join('');
+
+    const verdict = allowed
+      ? `<div class="verdict grant">${iconGrant} GRANT · visible to ${persona.name}</div>`
+      : `<div class="verdict deny">${iconDeny} DENY · hidden from ${persona.name}</div>`;
+
+    card.innerHTML = `
+      <div class="redacted"><span class="word">REVOKED</span></div>
+      <div class="row1">
+        <div><div class="id">${id} · ${m.kind}</div><div class="name">${m.name}</div></div>
+        <span class="chip ${lvlcls}"><span class="dot"></span>${LEVELS[r.level]}</span>
+      </div>
+      <div class="aud">${reqChip(r)}</div>
+      <div class="lineage">
+        <div class="l-lbl">lineage · derived_from</div>
+        <div class="l-chips">${srcChips}</div>
+        <div class="why">${whyLine(r)}</div>
+      </div>
+      ${verdict}`;
+    box.appendChild(card);
+
+    if (changedSrc && !allowed && m.from.includes(changedSrc) && !prevHiddenFromRevoke.has(id)) {
+      requestAnimationFrame(() => card.classList.add('revoked-hit'));
+    }
+  }
+}
+
+/* ---------- render: ledger ---------- */
+function renderLog() {
+  const box = $('#log'); box.innerHTML = '';
+  // newest first, interleaving anchors
+  const rows = [...S.ledger.chain].reverse().slice(0, 40);
+  for (const e of rows) {
+    if (e.anchor) {
+      const a = document.createElement('div'); a.className = 'anchor';
+      a.innerHTML = `⛓ batch anchored → HCS topic ${e.topic} · seq ${e.seq} · ${e.hash}…`;
+      box.appendChild(a); continue;
+    }
+    const d = document.createElement('div'); d.className = 'entry';
+    d.innerHTML = `
+      <div class="e1"><span>#${String(e.seq).padStart(3,'0')} · ${e.ts}</span><span class="dec ${e.decision}">${e.decision}</span></div>
+      <div class="e2">${e.principal} → ${e.object} <span class="rule">· ${e.rule}</span> · ${fmtLat(e.latencyMs)}</div>
+      <div class="hash">prev ${e.prev.slice(0,6)}… <span class="h">▸ ${e.hash}…</span></div>`;
+    box.appendChild(d);
+  }
+}
+
+function renderStats() {
+  const persona = S.personas[S.personaId];
+  let vis = 0, tot = 0;
+  for (const id of Object.keys(S.graph.derived)) { tot++; if (canRead(resolve(S.graph, id, S.clock), persona)) vis++; }
+  $('#visct').textContent = vis; $('#vistot').textContent = 'of ' + tot;
+  const pv = ledgerP99(S.ledger);
+  $('#p99').textContent = Number.isNaN(pv) ? '—' : fmtLat(pv);
+  $('#entct').textContent = S.ledger.seq;
+  $('#clock').textContent = S.clock.toISOString().slice(0, 10);
+  const chain = verifyChain(S.ledger);
+  $('#chainstatus').textContent = chain.intact ? 'chain intact ✓' : `chain BROKEN @${chain.brokenAt}`;
+  $('#chainstat').textContent = chain.intact ? 'hash-chained ✓' : 'tamper detected';
+}
+
+function currentHiddenSet() {
+  const persona = S.personas[S.personaId]; const set = new Set();
+  for (const id of Object.keys(S.graph.derived)) if (!canRead(resolve(S.graph, id, S.clock), persona)) set.add(id);
+  return set;
+}
+
+function recompute(reason, changedSrc) {
+  prevHiddenFromRevoke = (reason === 'revoke') ? new Set() : currentHiddenSet();
+  auditForViewer();
+  renderPersonas();
+  renderSources();
+  renderDerived(reason === 'revoke' ? changedSrc : null);
+  renderLog();
+  renderStats();
+}
+
+$('#advance').onclick = () => { S.clock = new Date(S.clock.getTime() + 30 * 86_400_000); recompute('clock'); };
+$('#reset').onclick = () => { boot(); recompute('init'); };
+
+recompute('init');
+</script>
+</body>
+</html>

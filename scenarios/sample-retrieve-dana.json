@@ -1,0 +1,78 @@
+{
+  "viewer": {
+    "id": "dana",
+    "name": "Dana",
+    "role": "Board+Eng",
+    "groups": [
+      "board",
+      "engineering"
+    ]
+  },
+  "enforcement": "deterministic · 0 LLM calls",
+  "decisions": [
+    {
+      "id": "MEM-01",
+      "decision": "GRANT",
+      "rule": "ReBAC ∧ requires board",
+      "latencyMs": 0.06858299998566508
+    },
+    {
+      "id": "MEM-02",
+      "decision": "GRANT",
+      "rule": "ReBAC ∧ requires everyone",
+      "latencyMs": 0.008916999999200925
+    },
+    {
+      "id": "MEM-03",
+      "decision": "GRANT",
+      "rule": "ReBAC ∧ requires board ∧ engineering",
+      "latencyMs": 0.005917000002227724
+    },
+    {
+      "id": "MEM-04",
+      "decision": "DENY",
+      "rule": "temporal: source locked → ∅",
+      "latencyMs": 0.007250000024214387
+    }
+  ],
+  "redactedView": [
+    {
+      "id": "MEM-01",
+      "visible": true,
+      "name": "Summary · Q3 performance",
+      "kind": "summary",
+      "lineage": [
+        "SRC-01",
+        "SRC-02"
+      ]
+    },
+    {
+      "id": "MEM-02",
+      "visible": true,
+      "name": "Embedding · harvest blog",
+      "kind": "embedding",
+      "lineage": [
+        "SRC-02"
+      ]
+    },
+    {
+      "id": "MEM-03",
+      "visible": true,
+      "name": "Note · infra ↔ board actions",
+      "kind": "note",
+      "lineage": [
+        "SRC-01",
+        "SRC-03"
+      ]
+    },
+    {
+      "id": "MEM-04",
+      "visible": false
+    }
+  ],
+  "inferenceGuard": {
+    "safe": true,
+    "leaks": []
+  },
+  "p99Ms": 0.13154200001736172
+}

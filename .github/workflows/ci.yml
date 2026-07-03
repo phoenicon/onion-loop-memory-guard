@@ -1,0 +1,24 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [18, 20, 22]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      # No dependencies to install — the engine runs on the Node stdlib.
+      - name: Invariant tests
+        run: node --test
+      - name: P99 benchmark (must stay under 200ms)
+        run: node bench/p99.js
+      - name: Emit scenario artifacts
+        run: node scripts/emit-scenario.js

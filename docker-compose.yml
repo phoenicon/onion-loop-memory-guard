@@ -1,0 +1,9 @@
+# One command: `docker compose up` → http://localhost:4173
+services:
+  onion-loop:
+    build: .
+    ports:
+      - "4173:4173"
+    environment:
+      - PORT=4173
+    restart: unless-stopped

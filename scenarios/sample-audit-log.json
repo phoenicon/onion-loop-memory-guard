@@ -1,0 +1,98 @@
+{
+  "entries": [
+    {
+      "seq": 8,
+      "ts": "2026-07-02 09:00:00",
+      "principal": "Dana",
+      "object": "MEM-04",
+      "decision": "DENY",
+      "rule": "temporal: source locked → ∅",
+      "latencyMs": 0.007250000024214387,
+      "prev": "7dd597ff",
+      "hash": "b611eef5"
+    },
+    {
+      "seq": 7,
+      "ts": "2026-07-02 09:00:00",
+      "principal": "Dana",
+      "object": "MEM-03",
+      "decision": "GRANT",
+      "rule": "ReBAC ∧ requires board ∧ engineering",
+      "latencyMs": 0.005917000002227724,
+      "prev": "a89112dd",
+      "hash": "7dd597ff"
+    },
+    {
+      "seq": 6,
+      "ts": "2026-07-02 09:00:00",
+      "principal": "Dana",
+      "object": "MEM-02",
+      "decision": "GRANT",
+      "rule": "ReBAC ∧ requires everyone",
+      "latencyMs": 0.008916999999200925,
+      "prev": "bd292a9b",
+      "hash": "a89112dd"
+    },
+    {
+      "seq": 5,
+      "ts": "2026-07-02 09:00:00",
+      "principal": "Dana",
+      "object": "MEM-01",
+      "decision": "GRANT",
+      "rule": "ReBAC ∧ requires board",
+      "latencyMs": 0.06858299998566508,
+      "prev": "59bf9a1a",
+      "hash": "bd292a9b"
+    },
+    {
+      "seq": 4,
+      "ts": "2026-07-02 09:00:00",
+      "principal": "Carol",
+      "object": "MEM-04",
+      "decision": "DENY",
+      "rule": "temporal: source locked → ∅",
+      "latencyMs": 0.02770899998722598,
+      "prev": "07b859af",
+      "hash": "59bf9a1a"
+    },
+    {
+      "seq": 3,
+      "ts": "2026-07-02 09:00:00",
+      "principal": "Carol",
+      "object": "MEM-03",
+      "decision": "DENY",
+      "rule": "ReBAC ∧ requires board ∧ engineering",
+      "latencyMs": 0.008749999979045242,
+      "prev": "58fec8d8",
+      "hash": "07b859af"
+    },
+    {
+      "seq": 2,
+      "ts": "2026-07-02 09:00:00",
+      "principal": "Carol",
+      "object": "MEM-02",
+      "decision": "GRANT",
+      "rule": "ReBAC ∧ requires everyone",
+      "latencyMs": 0.010041000001365319,
+      "prev": "a8f7d052",
+      "hash": "58fec8d8"
+    },
+    {
+      "seq": 1,
+      "ts": "2026-07-02 09:00:00",
+      "principal": "Carol",
+      "object": "MEM-01",
+      "decision": "DENY",
+      "rule": "ReBAC ∧ requires board",
+      "latencyMs": 0.13154200001736172,
+      "prev": "genesis",
+      "hash": "a8f7d052"
+    }
+  ],
+  "chain": {
+    "intact": true,
+    "brokenAt": null
+  },
+  "p99Ms": 0.13154200001736172,
+  "count": 8
+}

@@ -1,0 +1,26 @@
+{
+  "MEM-01": {
+    "Alice": "GRANT",
+    "Dana": "GRANT",
+    "Bob": "DENY",
+    "Carol": "DENY"
+  },
+  "MEM-02": {
+    "Alice": "GRANT",
+    "Dana": "GRANT",
+    "Bob": "GRANT",
+    "Carol": "GRANT"
+  },
+  "MEM-03": {
+    "Alice": "DENY",
+    "Dana": "GRANT",
+    "Bob": "DENY",
+    "Carol": "DENY"
+  },
+  "MEM-04": {
+    "Alice": "DENY",
+    "Dana": "DENY",
+    "Bob": "DENY",
+    "Carol": "DENY"
+  }
+}

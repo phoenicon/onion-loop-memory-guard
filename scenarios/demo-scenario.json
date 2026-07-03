@@ -1,0 +1,73 @@
+{
+  "epoch": "2026-07-02T09:00:00.000Z",
+  "sources": [
+    {
+      "id": "SRC-01",
+      "name": "Q3 Board Deck",
+      "level": "Confidential",
+      "audience": "{board}",
+      "revoked": false,
+      "unlockDays": 0
+    },
+    {
+      "id": "SRC-02",
+      "name": "Blog: Harvest Report",
+      "level": "Public",
+      "audience": "everyone",
+      "revoked": false,
+      "unlockDays": 0
+    },
+    {
+      "id": "SRC-03",
+      "name": "Infra Runbook",
+      "level": "Internal",
+      "audience": "{engineering}",
+      "revoked": false,
+      "unlockDays": 0
+    },
+    {
+      "id": "SRC-04",
+      "name": "Leadership Call — Strategy",
+      "level": "Confidential",
+      "audience": "{board}",
+      "revoked": false,
+      "unlockDays": 30
+    }
+  ],
+  "derived": [
+    {
+      "id": "MEM-01",
+      "name": "Summary · Q3 performance",
+      "kind": "summary",
+      "derived_from": [
+        "SRC-01",
+        "SRC-02"
+      ]
+    },
+    {
+      "id": "MEM-02",
+      "name": "Embedding · harvest blog",
+      "kind": "embedding",
+      "derived_from": [
+        "SRC-02"
+      ]
+    },
+    {
+      "id": "MEM-03",
+      "name": "Note · infra ↔ board actions",
+      "kind": "note",
+      "derived_from": [
+        "SRC-01",
+        "SRC-03"
+      ]
+    },
+    {
+      "id": "MEM-04",
+      "name": "Summary · leadership strategy",
+      "kind": "summary",
+      "derived_from": [
+        "SRC-04"
+      ]
+    }
+  ]
+}
