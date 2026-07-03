@@ -21,6 +21,8 @@ That is the whole guarantee. Everything else is a consequence of it.
 | **Stale permissions after a change** | Access is never cached on the derivative. Revoke a source and the next read recomputes to ∅ — nothing to invalidate. |
 | **Prompt-injection of the permission decision** | The model is not on the decision path. No prompt can talk the gate into "just this once." |
 | **Metadata / side-channel inference** — learning a confidential item *exists* from a denied result's title or lineage | Denied nodes are returned as opaque tombstones (`{id, visible:false}`). `auditLeaks()` asserts no exposed field references an uncleared source. |
+| **Cross-document reconstruction** — combining individually-returned memories to rebuild a denied one | `reconstructionAudit()` flags any denied node whose lineage is fully covered by the union of the returned set's lineage. Under strict enforcement it is provably `safe`; it fires the moment a pipeline over-shares. |
+| **Stale reads under concurrent ACL updates** | No permission is cached on a derivative; each read recomputes from live source state in one synchronous pass. There is no read-modify-write window. Demonstrated under interleaved mutation load. |
 | **Premature disclosure** — reading time-embargoed material early | Temporal rules contribute ∅ until the unlock instant; enforced by the same intersection. |
 | **Audit tampering** — editing the log after the fact | FNV-1a hash chain (`hash = fnv1a(prev + payload)`); any edit breaks every subsequent link. `verifyChain()` returns the exact broken sequence number. HCS anchoring adds an independent timestamp. |
 
@@ -28,12 +30,14 @@ That is the whole guarantee. Everything else is a consequence of it.
 
 Being explicit here is the point:
 
-- **Content-level statistical inference is out of scope.** If a viewer is
-  *legitimately* granted two low-sensitivity memories whose contents, correlated,
-  let them *guess* at something more sensitive, this system does not stop that.
-  That is an open research problem (differential privacy / query auditing over
-  content), and conflating it with access control would be overclaiming. Our
-  inference guard defends the **metadata** channel, not the semantic one.
+- **Content-level statistical inference is out of scope.** We defend two concrete
+  inference channels — **metadata** (tombstoning denied results) and
+  **lineage reconstruction** (`reconstructionAudit`). We do *not* claim to stop
+  the semantic case: if a viewer is *legitimately* granted two low-sensitivity
+  memories whose *contents*, correlated, let them *guess* at something more
+  sensitive. That is an open research problem (differential privacy / query
+  auditing over content), and conflating it with access control would be
+  overclaiming. We flag it as future work, not a solved feature.
 - **Write-time classification is only as good as the classifier.** If the
   classifier mislabels a confidential source as public, the gate will faithfully
   enforce the wrong label. Classification quality is a separate concern from

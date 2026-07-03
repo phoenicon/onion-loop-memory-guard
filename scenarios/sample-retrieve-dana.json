@@ -9,30 +9,31 @@
     ]
   },
   "enforcement": "deterministic · 0 LLM calls",
+  "consistency": "no cached permissions — access recomputed from live source ACLs at read time",
   "decisions": [
     {
       "id": "MEM-01",
       "decision": "GRANT",
       "rule": "ReBAC ∧ requires board",
-      "latencyMs": 0.06858299998566508
+      "latencyMs": 0.009499999999889042
     },
     {
       "id": "MEM-02",
       "decision": "GRANT",
       "rule": "ReBAC ∧ requires everyone",
-      "latencyMs": 0.008916999999200925
+      "latencyMs": 0.0016669999999976426
     },
     {
       "id": "MEM-03",
       "decision": "GRANT",
       "rule": "ReBAC ∧ requires board ∧ engineering",
-      "latencyMs": 0.005917000002227724
+      "latencyMs": 0.0017920000000231084
     },
     {
       "id": "MEM-04",
       "decision": "DENY",
       "rule": "temporal: source locked → ∅",
-      "latencyMs": 0.007250000024214387
+      "latencyMs": 0.0036670000001777225
     }
   ],
   "redactedView": [
@@ -71,8 +72,14 @@
     }
   ],
   "inferenceGuard": {
-    "safe": true,
-    "leaks": []
+    "metadata": {
+      "safe": true,
+      "leaks": []
+    },
+    "reconstruction": {
+      "safe": true,
+      "reconstructable": []
+    }
   },
-  "p99Ms": 0.13154200001736172
+  "p99Ms": 0.14420900000004622
 }

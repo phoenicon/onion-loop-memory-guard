@@ -7,7 +7,7 @@ where each requirement is implemented, tested, and demonstrated.
 
 | Bounty requirement | Where it lives | Proof |
 |---|---|---|
-| **Stays synchronized with source ACLs under concurrent updates** | Access is never copied onto derivatives; every read recomputes from live source state (`resolve` in [`engine.js`](../src/engine.js)). There is no derived-permission cache to fall out of sync. | [`test/revocation.test.js`](../test/revocation.test.js) — revoke/restore reflect on the next read for all viewers |
+| **Stays synchronized with source ACLs under concurrent updates** | Permissions are *never cached* on derived memories. Every retrieval recomputes effective access directly from current source ACLs in one synchronous pass — no read-modify-write window in which a stale permission can be served. | [`test/concurrency.test.js`](../test/concurrency.test.js) — 12,000+ reads interleaved with live revoke/restore/clock mutations, each checked against an atomic witness; **zero stale grants**. Plus [`test/revocation.test.js`](../test/revocation.test.js) |
 | **Enforcement at the retrieval layer, no LLM call for the permission decision** | `canRead()` is pure set logic; the decision path imports nothing that calls a model. Classification *may* use an LLM at write time only. | [`test/engine.test.js`](../test/engine.test.js) *"decisions are deterministic"*; console stat *"Deterministic · 0 LLM calls"* |
 | **Audit logs meeting regulatory standards** | Hash-chained, append-only ledger; each entry carries principal, object, decision, human-readable rule, latency, and `prev→hash` link. Batches anchor to Hedera HCS. | [`test/audit.test.js`](../test/audit.test.js) — chain verifies; tamper detected at exact seam. Sample: [`scenarios/sample-audit-log.json`](../scenarios/sample-audit-log.json) |
 | **Sub-200ms P99 permission checks** | Pure computation, O(sources per node). | `npm run bench` → **P99 ≈ 0.38µs**, ~500,000× under budget. [`bench/p99.js`](../bench/p99.js) |
@@ -18,7 +18,7 @@ where each requirement is implemented, tested, and demonstrated.
 | Bonus | Status | Where |
 |---|---|---|
 | **Temporal access rules** ("unlock after 30 days") | ✅ Implemented | `effectiveAudience` time-lock in [`engine.js`](../src/engine.js); [`test/temporal.test.js`](../test/temporal.test.js); demo *Advance +30 days* |
-| **Query-time inference prevention** (cross-boundary leakage) | ✅ Metadata channel; scope stated honestly | [`inference.js`](../src/inference.js); [`test/inference.test.js`](../test/inference.test.js); [`SECURITY-MODEL.md`](SECURITY-MODEL.md) draws the line at content-level statistical inference |
+| **Query-time inference prevention** (cross-boundary leakage) | ✅ Two layers, scope stated | (1) metadata tombstoning (`auditLeaks`) + (2) cross-document `reconstructionAudit` that *catches* an over-sharing pipeline — [`inference.js`](../src/inference.js); [`test/inference.test.js`](../test/inference.test.js). Content-level *statistical* inference explicitly out of scope in [`SECURITY-MODEL.md`](SECURITY-MODEL.md) |
 
 ## Judge checklist (from the submission guide)
 

@@ -1,48 +1,92 @@
 {
   "entries": [
     {
-      "seq": 8,
+      "seq": 12,
       "ts": "2026-07-02 09:00:00",
       "principal": "Dana",
       "object": "MEM-04",
       "decision": "DENY",
       "rule": "temporal: source locked → ∅",
-      "latencyMs": 0.007250000024214387,
-      "prev": "7dd597ff",
-      "hash": "b611eef5"
+      "latencyMs": 0.0036670000001777225,
+      "prev": "ace38fea",
+      "hash": "1c893efe"
     },
     {
-      "seq": 7,
+      "seq": 11,
       "ts": "2026-07-02 09:00:00",
       "principal": "Dana",
       "object": "MEM-03",
       "decision": "GRANT",
       "rule": "ReBAC ∧ requires board ∧ engineering",
-      "latencyMs": 0.005917000002227724,
-      "prev": "a89112dd",
-      "hash": "7dd597ff"
+      "latencyMs": 0.0017920000000231084,
+      "prev": "4b96627d",
+      "hash": "ace38fea"
     },
     {
-      "seq": 6,
+      "seq": 10,
       "ts": "2026-07-02 09:00:00",
       "principal": "Dana",
       "object": "MEM-02",
       "decision": "GRANT",
       "rule": "ReBAC ∧ requires everyone",
-      "latencyMs": 0.008916999999200925,
-      "prev": "bd292a9b",
-      "hash": "a89112dd"
+      "latencyMs": 0.0016669999999976426,
+      "prev": "fb796e01",
+      "hash": "4b96627d"
     },
     {
-      "seq": 5,
+      "seq": 9,
       "ts": "2026-07-02 09:00:00",
       "principal": "Dana",
       "object": "MEM-01",
       "decision": "GRANT",
       "rule": "ReBAC ∧ requires board",
-      "latencyMs": 0.06858299998566508,
+      "latencyMs": 0.009499999999889042,
+      "prev": "83dae2d7",
+      "hash": "fb796e01"
+    },
+    {
+      "seq": 8,
+      "ts": "2026-07-02 09:00:00",
+      "principal": "Carol",
+      "object": "MEM-04",
+      "decision": "DENY",
+      "rule": "temporal: source locked → ∅",
+      "latencyMs": 0.005041000000119311,
+      "prev": "1ef68ba0",
+      "hash": "83dae2d7"
+    },
+    {
+      "seq": 7,
+      "ts": "2026-07-02 09:00:00",
+      "principal": "Carol",
+      "object": "MEM-03",
+      "decision": "DENY",
+      "rule": "ReBAC ∧ requires board ∧ engineering",
+      "latencyMs": 0.009041999999908512,
+      "prev": "2e1e3b8f",
+      "hash": "1ef68ba0"
+    },
+    {
+      "seq": 6,
+      "ts": "2026-07-02 09:00:00",
+      "principal": "Carol",
+      "object": "MEM-02",
+      "decision": "GRANT",
+      "rule": "ReBAC ∧ requires everyone",
+      "latencyMs": 0.001875000000154614,
+      "prev": "cb9cd2a4",
+      "hash": "2e1e3b8f"
+    },
+    {
+      "seq": 5,
+      "ts": "2026-07-02 09:00:00",
+      "principal": "Carol",
+      "object": "MEM-01",
+      "decision": "DENY",
+      "rule": "ReBAC ∧ requires board",
+      "latencyMs": 0.018250000000080036,
       "prev": "59bf9a1a",
-      "hash": "bd292a9b"
+      "hash": "cb9cd2a4"
     },
     {
       "seq": 4,
@@ -51,7 +95,7 @@
       "object": "MEM-04",
       "decision": "DENY",
       "rule": "temporal: source locked → ∅",
-      "latencyMs": 0.02770899998722598,
+      "latencyMs": 0.0326670000000604,
       "prev": "07b859af",
       "hash": "59bf9a1a"
     },
@@ -62,7 +106,7 @@
       "object": "MEM-03",
       "decision": "DENY",
       "rule": "ReBAC ∧ requires board ∧ engineering",
-      "latencyMs": 0.008749999979045242,
+      "latencyMs": 0.011875000000031832,
       "prev": "58fec8d8",
       "hash": "07b859af"
     },
@@ -73,7 +117,7 @@
       "object": "MEM-02",
       "decision": "GRANT",
       "rule": "ReBAC ∧ requires everyone",
-      "latencyMs": 0.010041000001365319,
+      "latencyMs": 0.01637500000003911,
       "prev": "a8f7d052",
       "hash": "58fec8d8"
     },
@@ -84,7 +128,7 @@
       "object": "MEM-01",
       "decision": "DENY",
       "rule": "ReBAC ∧ requires board",
-      "latencyMs": 0.13154200001736172,
+      "latencyMs": 0.14420900000004622,
       "prev": "genesis",
       "hash": "a8f7d052"
     }
@@ -93,6 +137,6 @@
     "intact": true,
     "brokenAt": null
   },
-  "p99Ms": 0.13154200001736172,
-  "count": 8
+  "p99Ms": 0.14420900000004622,
+  "count": 12
 }

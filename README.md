@@ -130,11 +130,11 @@ Every bounty requirement, mapped to code, tests and proof, in
 
 - ✅ **Retrieval-layer enforcement, deterministic** — no LLM on the decision path
 - ✅ **Lineage-governed derived memory** — audience = per-source intersection
-- ✅ **Revocation propagates** — no cache; next read is correct
-- ✅ **Regulatory audit** — hash-chained, tamper-evident, HCS-anchored
+- ✅ **In sync with source ACLs under concurrent updates** — permissions are *never cached* on derived memories; every retrieval recomputes effective access directly from current source ACLs, so revocations and ACL changes propagate immediately with no stale-permission window. *Demonstrated* by an interleaved concurrency stress test ([`test/concurrency.test.js`](test/concurrency.test.js): 12,000+ reads against live mutations, zero stale grants)
+- ✅ **Regulatory audit** — hash-chained, tamper-evident, HCS-anchored, with timestamps + decision reasons
 - ✅ **Sub-200ms P99** — measured at ~0.38µs
 - ✅ **Bonus: temporal access rules** — "unlock after 30 days"
-- ✅ **Bonus: query-time inference prevention** — denied nodes leave as opaque tombstones ([scope stated honestly](docs/SECURITY-MODEL.md))
+- ✅ **Bonus: query-time inference prevention** — two honest layers: (1) denied results leave as opaque **tombstones** (no metadata side-channel), and (2) a **cross-document reconstruction auditor** that flags when the union of a viewer's granted memories' lineage would let them reconstruct a denied one. Content-level *statistical* inference is explicitly out of scope — [stated plainly](docs/SECURITY-MODEL.md), not oversold
 
 ---
 

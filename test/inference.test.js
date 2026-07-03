@@ -2,7 +2,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { freshScenario } from '../src/scenario.js';
-import { redactedView, auditLeaks } from '../src/inference.js';
+import { redactedView, auditLeaks, reconstructionAudit } from '../src/inference.js';
+import { UNIVERSAL, groups } from '../src/audience.js';
 
 test('denied memories are returned as opaque tombstones — no leakable metadata', () => {
   const { graph, personas, epoch } = freshScenario();
@@ -40,4 +41,44 @@ test('a tombstone that carries metadata is flagged as a leak', () => {
   const bad = [{ id: 'MEM-04', visible: false, name: 'Summary · leadership strategy' }];
   const leak = auditLeaks(graph, personas.carol, epoch, bad);
   assert.equal(leak.safe, false);
+});
+
+// --- cross-document reconstruction (combinatorial inference) ---
+
+test('strict enforcement is provably reconstruction-safe for every persona', () => {
+  // With the correct (canRead) returned set, no viewer can reconstruct a denied
+  // memory from what they legitimately hold. This is the safety proof.
+  const { graph, personas, epoch } = freshScenario();
+  for (const p of Object.values(personas)) {
+    const r = reconstructionAudit(graph, p, epoch);
+    assert.equal(r.safe, true, `${p.name}: ${JSON.stringify(r.reconstructable)}`);
+  }
+});
+
+test('the auditor CATCHES a pipeline that over-shares across a permission boundary', () => {
+  // Threat: a buggy/loosened retriever returns a memory that embeds a confidential
+  // source. The viewer now holds that source's content and can reconstruct a
+  // second memory they were correctly denied.
+  const clock = new Date('2026-07-02T09:00:00Z');
+  const graph = {
+    epoch: clock,
+    sources: {
+      PUB: { id: 'PUB', name: 'Public brief', level: 0, base: UNIVERSAL(), revoked: false, unlockDays: 0 },
+      SEC: { id: 'SEC', name: 'Confidential board source', level: 2, base: groups('board'), revoked: false, unlockDays: 0 },
+    },
+    derived: {
+      LEAK: { id: 'LEAK', name: 'Over-shared digest', kind: 'summary', from: ['PUB', 'SEC'] }, // contains SEC!
+      SECRET: { id: 'SECRET', name: 'Confidential note', kind: 'note', from: ['SEC'] },        // correctly board-only
+    },
+  };
+  const carol = { id: 'carol', name: 'Carol', role: 'Contractor', groups: new Set() };
+
+  // Correct behaviour: neither is granted to Carol → safe.
+  assert.equal(reconstructionAudit(graph, carol, clock).safe, true);
+
+  // The bug: the pipeline returns LEAK to Carol anyway. Now she holds SEC's content,
+  // so the denied SECRET (from SEC) becomes reconstructable. The auditor fires.
+  const bad = reconstructionAudit(graph, carol, clock, ['LEAK']);
+  assert.equal(bad.safe, false);
+  assert.ok(bad.reconstructable.some((x) => x.node === 'SECRET' && x.coveredBy.includes('LEAK')));
 });

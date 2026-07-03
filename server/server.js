@@ -24,7 +24,7 @@ import { dirname, join, normalize, extname } from 'node:path';
 
 import { freshScenario } from '../src/scenario.js';
 import { check } from '../src/engine.js';
-import { redactedView, auditLeaks } from '../src/inference.js';
+import { redactedView, auditLeaks, reconstructionAudit } from '../src/inference.js';
 import { audienceToString } from '../src/audience.js';
 import { createLedger, record, entries, verifyChain, p99 } from '../src/audit.js';
 
@@ -61,12 +61,14 @@ function retrieve(res, personaId) {
   });
   const view = redactedView(world.graph, persona, clock);
   const leak = auditLeaks(world.graph, persona, clock, view);
+  const reconstruction = reconstructionAudit(world.graph, persona, clock);
   json(res, 200, {
     viewer: { id: persona.id, name: persona.name, role: persona.role, groups: [...persona.groups] },
     enforcement: 'deterministic · 0 LLM calls',
+    consistency: 'no cached permissions — access recomputed from live source ACLs at read time',
     decisions,
     redactedView: view,
-    inferenceGuard: leak,
+    inferenceGuard: { metadata: leak, reconstruction },
     p99Ms: p99(ledger),
   });
 }
