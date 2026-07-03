@@ -11,6 +11,7 @@
   "scripts": {
     "demo": "node server/server.js",
     "eli5": "node examples/eli5.js",
+    "vector": "node examples/vector-gate.js",
     "test": "node --test",
     "bench": "node bench/p99.js",
     "scenario:emit": "node scripts/emit-scenario.js",

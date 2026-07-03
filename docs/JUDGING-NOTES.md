@@ -35,8 +35,16 @@ where each requirement is implemented, tested, and demonstrated.
 ## How to verify in 60 seconds
 
 ```bash
-node --test            # 31 invariant tests, 0 deps
+node --test            # 39 invariant tests, 0 deps
 node bench/p99.js      # sub-200ms P99, printed
+npm run vector         # the gate in front of a REAL embedding + cosine search
 npm run demo           # open http://localhost:4173 and revoke SRC-01
 cat scenarios/decision-matrix.json   # the full persona × memory truth table
 ```
+
+**On "is it a real memory system?"** — `npm run vector` ([`examples/vector-gate.js`](../examples/vector-gate.js))
+runs the gate in front of a genuine embed → store → cosine nearest-neighbour
+search. It shows similarity ranking a confidential board deck as the #1 hit for a
+budget query, and the engine dropping it for a contractor while keeping it for a
+board member — proving enforcement, not relevance, decides visibility. Local
+zero-key embedder by default; OpenAI `text-embedding-3-small` if a key is set.

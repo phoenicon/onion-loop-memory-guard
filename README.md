@@ -65,9 +65,22 @@ vanish for everyone, with an audit entry explaining why. Full walkthrough:
 Verify the claims yourself:
 
 ```bash
-node --test          # 31 invariant tests (deterministic, revocation, temporal, audit, inference)
+node --test          # 39 invariant tests (deterministic, revocation, temporal, audit, inference, concurrency, vector-gate)
 node bench/p99.js    # sub-200ms P99 — prints ~0.38µs, ~500,000× under budget
+npm run vector       # the gate in front of a REAL embedding + similarity search
+npm run eli5         # the whole idea narrated in 30 seconds
 ```
+
+### The gate in front of a real vector search
+
+`npm run vector` runs an end-to-end retrieval: it embeds a corpus, does a genuine
+cosine **nearest-neighbour search**, then runs the *same engine* over the hits.
+The point it makes: similarity search will happily rank a **confidential board
+deck as the #1 hit** for a budget query — so relevance can't be trusted to decide
+visibility. The gate drops it for a contractor and keeps it for a board member,
+deterministically, *after* the search. Embeddings use a dependency-free local
+embedder by default, or OpenAI `text-embedding-3-small` if `OPENAI_API_KEY` is
+set; swap the store for Pinecone/pgvector without touching the gate.
 
 ---
 
@@ -153,6 +166,7 @@ src/            the engine — dependency-free ES modules (one source of truth)
   engine.js       lineage resolution + temporal rules + the decision
   audit.js        hash-chained, HCS-anchored ledger
   inference.js    bonus: redacted views + leak self-audit
+  vector.js       real embeddings + cosine store (the gate runs in front of it)
   scenario.js     the canonical demo world
 web/            the Clearance Console — imports src/ directly (zero build)
 server/         dependency-free Node host: serves the console + JSON API
@@ -180,7 +194,7 @@ curl "http://localhost:4173/api/scenario"            # sources, derived memories
 ## Roadmap
 
 - **Middleware + SDK** — drop-in `retrieve()` gate for LangChain / LlamaIndex / MCP memory tools
-- **Pluggable stores** — back the graph with SpiceDB (ReBAC) and a real vector index; SHA-256 audit hashing
+- **Pluggable stores** — the gate already runs in front of a real embedding + cosine search ([`src/vector.js`](src/vector.js), `npm run vector`); next: back it with SpiceDB (ReBAC) + Pinecone/pgvector at scale, and SHA-256 audit hashing
 - **Live Hedera HCS anchoring** — replace the simulated anchor with real testnet topic submission ([backend already live](https://github.com/phoenicon))
 - **Canton settlement** — governed, privacy-preserving institutional workflows for regulated deployments (finance, health, RWA)
 - **Content-level inference auditing** — the honest open problem (see [SECURITY-MODEL.md](docs/SECURITY-MODEL.md))
