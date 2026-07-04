@@ -13,6 +13,17 @@ Everything you screen-record already exists and is live:
 
 ---
 
+## ⚡ Shortcut — the self-playing reel (`web/reel.html`)
+
+For the **trailer**, you don't have to click anything. Open
+[`web/reel.html`](../web/reel.html) (live: `…/web/reel.html`), press **Play**, and
+**screen-record the frame** — it auto-runs the whole story in ~60s with on-screen
+captions (title → problem → who-can-read → revoke → vanish → vector-gate → audit →
+proof → outro). Record it once, drop your voiceover over the top from the script
+below (or ship it silent — the captions carry it). Fable b-roll optional.
+
+---
+
 ## 🎬 VIDEO 1 — Trailer (60 seconds)
 
 | # | Time | On screen (capture) | Voiceover (read this) |

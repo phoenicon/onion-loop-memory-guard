@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Onion Loop — demo reel</title>
+<meta name="description" content="A self-playing, captioned demo reel for Onion Loop Memory Guard. Press play, screen-record ~60s, done." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.31.0/tabler-icons.min.css">
+<style>
+  :root{
+    --ink:#090D14; --panel:#121826; --panel2:#0E1420; --raise:#182032;
+    --line:#223047; --line-soft:#1a2537;
+    --text:#EEF2F9; --muted:#8A99B0; --faint:#586780;
+    --pub:#38BDA0; --int:#E0A23B; --conf:#E5484D; --violet:#8B7CF0;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+    --disp:'Space Grotesk',system-ui,sans-serif; --body:'Inter',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box} html,body{margin:0;height:100%}
+  body{background:radial-gradient(1200px 700px at 70% -10%,rgba(139,124,240,.10),transparent 60%),radial-gradient(900px 600px at -10% 110%,rgba(56,189,160,.07),transparent 55%),var(--ink);color:var(--text);font-family:var(--body);-webkit-font-smoothing:antialiased}
+  /* 16:9 stage sized for clean 1920x1080 capture */
+  .frame{width:min(96vw,1120px);aspect-ratio:16/9;margin:3vh auto 0;position:relative;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:linear-gradient(180deg,#0c111b,#090d14)}
+  .prog{position:absolute;top:0;left:0;height:3px;background:var(--violet);width:0;transition:width .2s linear;z-index:5}
+  .stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:52px}
+  .cap{position:absolute;left:0;right:0;bottom:0;padding:22px 40px 30px;background:linear-gradient(0deg,rgba(9,13,20,.92),transparent);z-index:4}
+  .cap .t{font-family:var(--disp);font-weight:600;font-size:29px;line-height:1.25;letter-spacing:-.01em;max-width:24ch;opacity:0;transform:translateY(10px);transition:.5s}
+  .cap .t.show{opacity:1;transform:none}
+  .cap .t b{color:var(--pub)} .cap .t .r{color:var(--conf)} .cap .t .v{color:var(--violet)}
+  .kick{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);margin-bottom:8px;opacity:0;transition:.4s}
+  .kick.show{opacity:1}
+
+  /* controls */
+  .bar{width:min(96vw,1120px);margin:14px auto 0;display:flex;gap:12px;align-items:center;justify-content:center}
+  .btn{appearance:none;font-family:var(--body);font-weight:500;font-size:15px;border:1px solid var(--violet);background:rgba(139,124,240,.14);color:var(--text);border-radius:10px;padding:11px 20px;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+  .btn.ghost{border-color:var(--line);background:var(--panel2);color:var(--muted)}
+  .hint{font-family:var(--mono);font-size:11px;color:var(--faint);text-align:center;margin-top:8px}
+
+  /* building blocks */
+  .title h1{font-family:var(--disp);font-weight:600;font-size:52px;margin:0;letter-spacing:-.02em;display:flex;align-items:center;gap:16px}
+  .title .sub{color:var(--muted);font-size:19px;margin-top:14px;font-family:var(--disp)}
+  .title .tags{margin-top:22px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  .tag{font-family:var(--mono);font-size:12px;color:var(--violet);border:1px solid rgba(139,124,240,.4);background:rgba(139,124,240,.08);border-radius:20px;padding:6px 13px}
+  .onion{font-size:52px;filter:drop-shadow(0 0 22px rgba(139,124,240,.5))}
+
+  .cards{display:flex;gap:18px;align-items:center}
+  .doc{width:150px;border-radius:12px;border:1px solid var(--line);background:var(--panel);padding:14px}
+  .doc .id{font-family:var(--mono);font-size:11px;color:var(--faint)}
+  .doc .nm{font-family:var(--disp);font-weight:500;font-size:16px;margin-top:4px}
+  .doc .chip{margin-top:10px;display:inline-flex;gap:5px;align-items:center;font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:6px}
+  .chip.pub{color:var(--pub);background:rgba(56,189,160,.12)} .chip.conf{color:var(--conf);background:rgba(229,72,77,.14)}
+  .arrow{color:var(--faint);font-size:26px}
+  .sum{width:196px;border:1px dashed #2c3550;border-radius:12px;background:var(--panel);padding:15px;position:relative;overflow:hidden;transition:.5s}
+  .sum.gone{opacity:.32;filter:grayscale(.6)}
+  .sum .verdict{margin-top:12px;font-family:var(--mono);font-size:13px;display:flex;gap:7px;align-items:center}
+  .grant{color:var(--pub)} .deny{color:var(--conf)}
+  .stamp{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0}
+  .stamp span{font-family:var(--disp);font-weight:700;font-size:26px;letter-spacing:.2em;color:var(--conf);border:3px solid var(--conf);border-radius:8px;padding:6px 18px;transform:rotate(-9deg) scale(1.7);opacity:0}
+  .sum.slam .stamp{opacity:1}
+  .sum.slam .stamp span{animation:slam .55s cubic-bezier(.2,1.3,.3,1) forwards}
+  @keyframes slam{0%{transform:rotate(-9deg) scale(2);opacity:0}55%{opacity:1}100%{transform:rotate(-9deg) scale(1);opacity:.95}}
+
+  .people{display:flex;gap:10px}
+  .p{border:1px solid var(--line);background:var(--panel2);border-radius:10px;padding:9px 13px;font-size:14px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;transition:.35s}
+  .p small{font-family:var(--mono);font-size:10px;color:var(--faint)}
+  .p.on{border-color:var(--violet);color:var(--text);background:var(--raise)}
+  .p .res{font-family:var(--mono);font-size:11px;margin-top:3px}
+
+  .rows{width:520px;display:flex;flex-direction:column;gap:9px}
+  .row{display:flex;align-items:center;gap:14px;border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:11px 14px;transition:.4s}
+  .row .score{font-family:var(--mono);font-size:14px;color:var(--violet);width:56px}
+  .row .nm{flex:1;font-size:15px}
+  .row .st{font-family:var(--mono);font-size:12px}
+  .row.block{border-color:rgba(229,72,77,.4)} .row.block .nm{color:var(--muted);text-decoration:line-through}
+  .row.pass{border-color:rgba(56,189,160,.4)}
+
+  .ledger{width:560px;border:1px solid var(--line);background:var(--panel2);border-radius:12px;overflow:hidden}
+  .ledger .h{padding:11px 14px;border-bottom:1px solid var(--line);font-family:var(--disp);font-weight:600;font-size:14px;display:flex;justify-content:between;gap:10px;align-items:center;justify-content:space-between}
+  .ledger .h .ok{font-family:var(--mono);font-size:12px;color:var(--pub)}
+  .entry{font-family:var(--mono);font-size:12px;padding:9px 14px;border-bottom:1px solid var(--line-soft);display:flex;gap:12px;align-items:center;opacity:0;transform:translateX(-8px);transition:.3s}
+  .entry.show{opacity:1;transform:none}
+  .entry .dec{font-weight:600;width:52px} .entry .g{color:var(--pub)} .entry .d{color:var(--conf)}
+  .entry .hash{color:var(--violet);margin-left:auto}
+
+  .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;width:600px}
+  .stat{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:16px 18px}
+  .stat .v{font-family:var(--disp);font-weight:600;font-size:34px;color:var(--pub)}
+  .stat .v.violet{color:var(--violet)}
+  .stat .k{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:4px}
+
+  .outro{text-align:center}
+  .outro .tag2{font-family:var(--disp);font-weight:600;font-size:34px}
+  .outro .q{font-family:var(--mono);font-size:16px;color:var(--violet);margin-top:16px}
+  .outro .u{font-family:var(--mono);font-size:14px;color:var(--muted);margin-top:18px;line-height:1.9}
+  .fade{animation:fade .6s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(12px)}to{opacity:1}}
+</style>
+</head>
+<body>
+  <div class="frame">
+    <div class="prog" id="prog"></div>
+    <div class="stage" id="stage"></div>
+    <div class="cap"><div class="kick" id="kick"></div><div class="t" id="cap"></div></div>
+  </div>
+  <div class="bar">
+    <button class="btn" id="play"><i class="ti ti-player-play-filled" aria-hidden="true"></i> Play the reel</button>
+    <button class="btn ghost" id="replay" style="display:none"><i class="ti ti-refresh"></i> Replay</button>
+  </div>
+  <div class="hint">≈ 60s · press play, screen-record the frame above, add your voiceover from docs/VIDEO-PLAN.md</div>
+
+<script>
+(function(){
+  var $=function(i){return document.getElementById(i);};
+  var stage=$('stage'), cap=$('cap'), kick=$('kick'), prog=$('prog');
+
+  function setCap(k,html){ kick.textContent=k||''; kick.className='kick'; cap.className='t'; cap.innerHTML=html||'';
+    requestAnimationFrame(function(){ kick.className='kick show'; cap.className='t show'; }); }
+  function set(html){ stage.innerHTML='<div class="fade" style="width:100%;display:flex;justify-content:center">'+html+'</div>'; }
+
+  var docPub='<div class="doc"><div class="id">SRC-02</div><div class="nm">Harvest blog</div><span class="chip pub"><i class="ti ti-book"></i> anyone</span></div>';
+  var docSec='<div class="doc"><div class="id">SRC-01</div><div class="nm">Board deck</div><span class="chip conf"><i class="ti ti-lock"></i> board only</span></div>';
+  function sumCard(state){ // 'grant' | 'deny'
+    var v = state==='deny' ? '<div class="verdict deny"><i class="ti ti-eye-off"></i> hidden</div>' : '<div class="verdict grant"><i class="ti ti-eye"></i> visible</div>';
+    return '<div class="sum" id="sum"><div class="stamp"><span>REVOKED</span></div><div class="id" style="font-family:var(--mono);font-size:11px;color:var(--faint)">MEM-01 · AI summary</div><div class="nm" style="font-family:var(--disp);font-weight:500;font-size:16px;margin-top:4px">Summary of both</div>'+v+'</div>'; }
+
+  // ---- scenes ----
+  var scenes=[
+    { dur:3200, run:function(){ setCap('BasedAI · Permission-aware memory challenge','');
+      set('<div class="title" style="text-align:center"><h1><span class="onion">🧅</span> Onion Loop Memory Guard</h1><div class="sub">Permission-aware memory for AI agents</div><div class="tags"><span class="tag">0 LLM on the decision path</span><span class="tag">revocation by lineage</span><span class="tag">hash-chained audit</span></div></div>'); }},
+
+    { dur:5200, run:function(){ setCap('The problem','Your agent&apos;s memory has <b>no permissions</b>.');
+      set('<div class="cards">'+docPub+'<span class="arrow">+</span>'+docSec+'<span class="arrow">→</span>'+sumCard('grant')+'</div>'); }},
+
+    { dur:5200, run:function(){ setCap('Who can read it?','An AI summary of a secret deck will answer a <span class="r">contractor&apos;s</span> question.');
+      set('<div class="people">'
+        +'<div class="p on">Alice<small>board</small><span class="res grant">✓ sees it</span></div>'
+        +'<div class="p">Dana<small>board+eng</small><span class="res grant">✓ sees it</span></div>'
+        +'<div class="p">Bob<small>engineering</small><span class="res deny">✕ denied</span></div>'
+        +'<div class="p">Carol<small>contractor</small><span class="res deny">✕ denied</span></div></div>'); }},
+
+    { dur:5600, run:function(){ setCap('The fix','Revoke the <span class="r">source</span> — the summary keeps no rules of its own.');
+      set('<div class="cards">'+docPub+'<span class="arrow">+</span><div class="doc" style="opacity:.4;border-style:dashed"><div class="id">SRC-01</div><div class="nm" style="text-decoration:line-through;color:var(--muted)">Board deck</div><span class="chip conf" style="opacity:.6"><i class="ti ti-trash"></i> revoked</span></div><span class="arrow">→</span>'+sumCard('grant')+'</div>');
+      setTimeout(function(){ var s=$('sum'); if(s){ s.classList.add('slam'); setTimeout(function(){ s.classList.add('gone'); var v=s.querySelector('.verdict'); if(v){v.className='verdict deny';v.innerHTML='<i class="ti ti-eye-off"></i> gone, for everyone';} },600);} }, 700); }},
+
+    { dur:4200, run:function(){ setCap('','...and every summary of it <span class="r">vanishes</span> — instantly, for everyone.');
+      set('<div class="cards" style="opacity:.85">'+docPub+'<span class="arrow">+</span><div class="doc" style="opacity:.35;border-style:dashed"><div class="id">SRC-01</div><div class="nm" style="text-decoration:line-through;color:var(--muted)">Board deck</div></div><span class="arrow">→</span><div class="sum gone"><div class="id" style="font-family:var(--mono);font-size:11px;color:var(--faint)">MEM-01</div><div class="nm" style="font-family:var(--disp);font-size:16px;margin-top:4px">Summary of both</div><div class="verdict deny" style="margin-top:12px"><i class="ti ti-eye-off"></i> ∅ nobody</div></div></div>'); }},
+
+    { dur:6000, run:function(){ setCap('Not just a database gate','Semantic search ranks the secret <span class="v">#1</span>. The gate drops it anyway.');
+      set('<div class="rows" id="rows">'
+        +'<div class="row"><span class="score">0.58</span><span class="nm">Board deck — Q3 budget</span><span class="st" style="color:var(--faint)">confidential</span></div>'
+        +'<div class="row"><span class="score">0.40</span><span class="nm">Summary · Q3 performance</span><span class="st" style="color:var(--faint)">board</span></div>'
+        +'<div class="row"><span class="score">0.34</span><span class="nm">Harvest blog</span><span class="st" style="color:var(--faint)">public</span></div></div>');
+      setTimeout(function(){ var rows=document.querySelectorAll('#rows .row'); if(rows[0]){rows[0].classList.add('block');rows[0].querySelector('.st').innerHTML='<span class="deny">⛔ blocked</span>';} if(rows[1]){rows[1].classList.add('block');rows[1].querySelector('.st').innerHTML='<span class="deny">⛔ blocked</span>';} if(rows[2]){rows[2].classList.add('pass');rows[2].querySelector('.st').innerHTML='<span class="grant">✓ to the LLM</span>';} }, 1900); }},
+
+    { dur:5400, run:function(){ setCap('Regulator-grade audit','Every decision is <span class="v">hash-chained</span>. Edit one line, the chain breaks.');
+      set('<div class="ledger"><div class="h"><span>Audit ledger</span><span class="ok"><i class="ti ti-shield-check"></i> chain intact</span></div>'
+        +'<div class="entry" data-i="0"><span>#1</span><span class="dec g">GRANT</span><span>Alice → MEM-01</span><span class="hash">▸ df250796</span></div>'
+        +'<div class="entry" data-i="1"><span>#2</span><span class="dec d">DENY</span><span>Carol → MEM-01</span><span class="hash">▸ 499f1904</span></div>'
+        +'<div class="entry" data-i="2"><span>#3</span><span class="dec d">DENY</span><span>Bob → MEM-03</span><span class="hash">▸ 54ce78c5</span></div>'
+        +'<div class="entry" data-i="3"><span>#4</span><span class="dec g">GRANT</span><span>Dana → MEM-03</span><span class="hash">▸ 27dc374e</span></div></div>');
+      var es=document.querySelectorAll('.entry'); es.forEach(function(e,i){ setTimeout(function(){e.classList.add('show');}, 300+i*450); }); }},
+
+    { dur:5200, run:function(){ setCap('Proof, not promises','Every claim is tested, benchmarked, reproducible.');
+      set('<div class="stats"><div class="stat"><div class="v violet">0.38µs</div><div class="k">P99 permission check · ~500,000× under budget</div></div>'
+        +'<div class="stat"><div class="v">0</div><div class="k">LLM calls on the decision path</div></div>'
+        +'<div class="stat"><div class="v">39</div><div class="k">invariant tests · 0 dependencies</div></div>'
+        +'<div class="stat"><div class="v">12k+</div><div class="k">concurrent reads · zero stale grants</div></div></div>'); }},
+
+    { dur:5600, run:function(){ setCap('','');
+      set('<div class="outro"><div class="onion" style="font-size:44px">🧅</div><div class="tag2" style="margin-top:10px">Not a chatbot. Not a wrapper.</div><div class="sub" style="font-family:var(--disp);color:var(--muted);font-size:20px;margin-top:6px">A governance layer for agent memory.</div><div class="q">&ldquo;verify me — don&apos;t trust me&rdquo;</div><div class="u">phoenicon.github.io/onion-loop-memory-guard<br>github.com/phoenicon/onion-loop-memory-guard</div></div>'); }},
+  ];
+
+  var total=scenes.reduce(function(a,s){return a+s.dur;},0), t0=0, idx=0, timer=null, elapsed=0;
+  function playFrom(i){ idx=i; if(i>=scenes.length){ finish(); return; } scenes[i].run(); var d=scenes[i].dur;
+    var start=elapsed; var tick=setInterval(function(){ elapsed+=100; prog.style.width=(Math.min(elapsed,total)/total*100)+'%'; },100);
+    timer=setTimeout(function(){ clearInterval(tick); playFrom(i+1); }, d); }
+  function finish(){ $('play').style.display='none'; $('replay').style.display='inline-flex'; }
+  function start(){ $('play').style.display='none'; $('replay').style.display='none'; elapsed=0; prog.style.width='0'; playFrom(0); }
+  $('play').onclick=start;
+  $('replay').onclick=function(){ start(); };
+
+  // idle title
+  scenes[0].run();
+})();
+</script>
+</body>
+</html>
