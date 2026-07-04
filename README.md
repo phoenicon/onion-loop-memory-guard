@@ -215,14 +215,13 @@ Zero dependencies, so hosting is trivial — any Node host works.
 - **Canton settlement** — governed, privacy-preserving institutional workflows for regulated deployments (finance, health, RWA)
 - **Content-level inference auditing** — the honest open problem (see [SECURITY-MODEL.md](docs/SECURITY-MODEL.md))
 
-## Why I built it
+## Why it matters
 
 Enterprise AI cannot safely scale until agent memory is governed with the same
-rigor as the underlying data — in finance, health, government, and the
-real-world-asset tokenisation work I do at [Tokenise.Farm](https://tokenise.farm).
-The engineering lessons that shaped this build are in
+rigor as the underlying data — in finance, health, government, and any regulated,
+real-world-asset setting. The engineering lessons that shaped this build are in
 **[docs/FIELD-NOTES.md](docs/FIELD-NOTES.md)**.
 
 ## License
 
-[MIT](LICENSE) © 2026 Colin Porter ([@phoenicon](https://github.com/phoenicon))
+[MIT](LICENSE) © 2026 [@phoenicon](https://github.com/phoenicon)
