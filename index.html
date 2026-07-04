@@ -57,9 +57,15 @@
   footer{margin-top:34px;text-align:center;border-top:1px solid var(--line);padding-top:22px}
   .close{font-family:var(--disp);font-weight:600;font-size:20px}
   .q{font-family:var(--mono);font-size:14px;color:var(--violet);margin-top:10px}
-  .links{margin-top:16px;font-family:var(--mono);font-size:13px}
-  .links a{color:var(--muted);text-decoration:none;margin:0 8px}
-  .links a:hover{color:var(--violet)}
+  .cta{display:flex;gap:12px;justify-content:center;margin-top:24px;flex-wrap:wrap}
+  .btn{font-family:var(--body);font-weight:500;font-size:15px;text-decoration:none;border-radius:11px;padding:12px 20px;display:inline-flex;gap:8px;align-items:center;transition:.15s}
+  .btn.primary{background:var(--violet);color:#0b0f17;border:1px solid var(--violet)}
+  .btn.primary:hover{filter:brightness(1.1)}
+  .btn.ghost{background:var(--panel2);color:var(--text);border:1px solid var(--line)}
+  .btn.ghost:hover{border-color:var(--violet)}
+  .links{margin-top:18px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .links a{font-family:var(--mono);font-size:12.5px;color:var(--muted);text-decoration:none;border:1px solid var(--line);background:var(--panel2);border-radius:9px;padding:8px 13px;display:inline-flex;gap:6px;align-items:center;transition:.15s}
+  .links a:hover{border-color:var(--violet);color:var(--text)}
   .note{font-family:var(--mono);font-size:11.5px;color:var(--faint);text-align:center;margin-top:24px}
 
   @media (max-width:720px){ .stats{grid-template-columns:repeat(2,1fr)} .steps{grid-template-columns:1fr} h1{font-size:34px} }
@@ -73,6 +79,10 @@
     <h1><span class="onion">🧅</span> Onion Loop Memory Guard</h1>
     <div class="one">Permission-aware memory for AI agents. Access is <b>computed from lineage</b> — never decided by an LLM.</div>
     <div class="tags"><span class="tag">retrieval-layer enforcement</span><span class="tag">0 LLM on the decision path</span><span class="tag">revocation by lineage</span><span class="tag">hash-chained audit</span></div>
+    <div class="cta">
+      <a class="btn primary" href="web/reel.html"><i class="ti ti-player-play" aria-hidden="true"></i> Watch the 60-second reel</a>
+      <a class="btn ghost" href="https://github.com/phoenicon/onion-loop-memory-guard"><i class="ti ti-brand-github" aria-hidden="true"></i> Read the source</a>
+    </div>
   </header>
 
   <div class="stats">
@@ -123,7 +133,11 @@
     <div class="one" style="font-size:17px;margin-top:4px">A deterministic governance layer for agent memory.</div>
     <div class="q">&ldquo;verify me — don&apos;t trust me&rdquo;</div>
     <div class="links">
-      <a href="web/reel.html">reel</a>·<a href="web/library.html">library</a>·<a href="web/index.html">console</a>·<a href="https://github.com/phoenicon/onion-loop-memory-guard">source</a>·<a href="docs/Onion-Loop-Memory-Guard-deck.pptx">deck</a>
+      <a href="web/reel.html"><i class="ti ti-player-play" aria-hidden="true"></i> reel</a>
+      <a href="web/library.html"><i class="ti ti-books" aria-hidden="true"></i> library</a>
+      <a href="web/index.html"><i class="ti ti-adjustments" aria-hidden="true"></i> console</a>
+      <a href="https://github.com/phoenicon/onion-loop-memory-guard"><i class="ti ti-brand-github" aria-hidden="true"></i> source</a>
+      <a href="docs/Onion-Loop-Memory-Guard-deck.pptx"><i class="ti ti-presentation" aria-hidden="true"></i> deck</a>
     </div>
   </footer>
 </div>
