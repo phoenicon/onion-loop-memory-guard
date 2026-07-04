@@ -18,16 +18,16 @@ flowchart LR
   subgraph WRITE["write path · may use an LLM (once)"]
     D[Document / event] --> C[Classifier]
     C -->|assigns ACL relations| S[(Source + ACL)]
-    S --> M[Derive memory:\nsummary / embedding / note]
+    S --> M[Derive memory:<br/>summary / embedding / note]
     M -->|records lineage only| G[(Memory graph)]
   end
 
   subgraph READ["read path · deterministic, 0 LLM calls"]
-    Q[Retrieval request\nviewer + query] --> R[Resolve lineage\n→ leaf sources]
-    R --> I[Intersect ACLs\nper source, clock-aware]
-    I --> V[Vector / relevance filter\napplied AFTER the gate]
-    V --> A[Append hash-chained\naudit entry]
-    A --> O[Redacted result\n→ LLM context]
+    Q[Retrieval request<br/>viewer + query] --> R[Resolve lineage<br/>→ leaf sources]
+    R --> I[Intersect ACLs<br/>per source, clock-aware]
+    I --> V[Vector / relevance filter<br/>applied AFTER the gate]
+    V --> A[Append hash-chained<br/>audit entry]
+    A --> O[Redacted result<br/>→ LLM context]
   end
 
   G -.read-only.-> R
@@ -87,15 +87,15 @@ audience is recomputed on every read as the per-source intersection:
 
 ```mermaid
 flowchart TD
-  SRC01["SRC-01 · Q3 Board Deck\nConfidential · {board}"]
-  SRC02["SRC-02 · Harvest Blog\nPublic · everyone"]
-  SRC03["SRC-03 · Infra Runbook\nInternal · {engineering}"]
-  SRC04["SRC-04 · Leadership Call\nConfidential · {board} · unlocks +30d"]
+  SRC01["SRC-01 · Q3 Board Deck<br/>Confidential · {board}"]
+  SRC02["SRC-02 · Harvest Blog<br/>Public · everyone"]
+  SRC03["SRC-03 · Infra Runbook<br/>Internal · {engineering}"]
+  SRC04["SRC-04 · Leadership Call<br/>Confidential · {board} · unlocks +30d"]
 
-  MEM01["MEM-01 · Summary\nrequires {board}"]
-  MEM02["MEM-02 · Embedding\nrequires everyone"]
-  MEM03["MEM-03 · Note\nrequires {board} ∧ {engineering}"]
-  MEM04["MEM-04 · Summary\n∅ until unlock, then {board}"]
+  MEM01["MEM-01 · Summary<br/>requires {board}"]
+  MEM02["MEM-02 · Embedding<br/>requires everyone"]
+  MEM03["MEM-03 · Note<br/>requires {board} ∧ {engineering}"]
+  MEM04["MEM-04 · Summary<br/>∅ until unlock, then {board}"]
 
   SRC01 --> MEM01
   SRC02 --> MEM01

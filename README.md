@@ -107,11 +107,11 @@ The **read path** is pure computation.
 flowchart LR
   subgraph WRITE["write path · LLM allowed (once)"]
     D[Document] --> C[Classify → ACL] --> S[(Source + ACL)]
-    S --> M[Derive: summary / embedding / note] --> G[(Memory graph:\nlineage only)]
+    S --> M[Derive: summary / embedding / note] --> G[(Memory graph:<br/>lineage only)]
   end
   subgraph READ["read path · deterministic · 0 LLM calls"]
-    Q[Retrieve\nviewer + query] --> R[Resolve lineage → sources]
-    R --> I[Intersect ACLs\nclock-aware] --> V[Relevance filter\nAFTER the gate]
+    Q[Retrieve<br/>viewer + query] --> R[Resolve lineage → sources]
+    R --> I[Intersect ACLs<br/>clock-aware] --> V[Relevance filter<br/>AFTER the gate]
     V --> A[Hash-chained audit] --> O[Redacted result → LLM]
   end
   G -.read-only.-> R
