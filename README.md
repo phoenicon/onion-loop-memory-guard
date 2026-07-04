@@ -1,16 +1,17 @@
 <div align="center">
 
-# 🧅 Onion Loop Memory Guard
+<h1>🧅 Onion Loop Memory Guard</h1>
 
-### Permission-aware memory for AI agents — deterministic access, governed by lineage, proven by audit.
+<p><b>Permission-aware memory for AI agents</b><br>
+deterministic access · governed by lineage · proven by audit</p>
 
-**Secure memory. Deterministic access. Accountable AI.**
+<h3>▶ <a href="https://phoenicon.github.io/onion-loop-memory-guard/">Live demo — start here</a></h3>
 
-`retrieval-layer enforcement` · `0 LLM calls on the decision path` · `revocation by lineage` · `hash-chained audit`
+<p><a href="https://phoenicon.github.io/onion-loop-memory-guard/web/reel.html">🎬 60s reel</a> &nbsp;·&nbsp; <a href="https://phoenicon.github.io/onion-loop-memory-guard/web/library.html">📚 library</a> &nbsp;·&nbsp; <a href="https://phoenicon.github.io/onion-loop-memory-guard/web/index.html">🎛️ console</a></p>
 
-Built for the **BasedAI Permission-Aware Memory Challenge** — *UK AI Agent Hackathon Ep5 × Conduct*
+<p><code>retrieval-layer enforcement</code> · <code>0 LLM on the decision path</code> · <code>revocation by lineage</code> · <code>hash-chained audit</code></p>
 
-**▶ [Start here — the live hub](https://phoenicon.github.io/onion-loop-memory-guard/)** · or jump to [📚 library](https://phoenicon.github.io/onion-loop-memory-guard/web/library.html) · [🎛️ console](https://phoenicon.github.io/onion-loop-memory-guard/web/index.html) · [🎬 60s reel](https://phoenicon.github.io/onion-loop-memory-guard/web/reel.html)
+<sub>Built for the BasedAI Permission-Aware Memory Challenge · UK AI Agent Hackathon Ep5 × Conduct</sub>
 
 </div>
 
