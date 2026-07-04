@@ -11,12 +11,11 @@ Onion Loop Memory Guard
 Permission-aware memory for AI agents — deterministic access, governed by lineage, proven by audit.
 
 ## Links
-- **Live demo (no install):** https://phoenicon.github.io/onion-loop-memory-guard/web/library.html
-- **Technical console:** https://phoenicon.github.io/onion-loop-memory-guard/web/index.html
-- **60s reel:** https://phoenicon.github.io/onion-loop-memory-guard/web/reel.html
+- **▶ START HERE — the hub (one link, guided 4-step tour):** https://phoenicon.github.io/onion-loop-memory-guard/
+- **Video / demo:** https://phoenicon.github.io/onion-loop-memory-guard/web/reel.html  *(the self-playing 60s reel — press play)*
 - **Source:** https://github.com/phoenicon/onion-loop-memory-guard
-- **Live API (Render):** _[paste your onion-loop-memory-guard.onrender.com URL]_
-- **Video:** _[paste your video link]_
+- (the hub links onward to the library, console, deck and repo — no need to paste them all)
+- **Live API (Render), optional:** _[paste your onion-loop-memory-guard.onrender.com URL]_
 
 ## Tags
 `ai-agents` `access-control` `rebac` `lineage` `audit-log` `hedera` `retrieval` `memory` `governance`

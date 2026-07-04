@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Onion Loop Memory Guard — start here</title>
+<meta name="description" content="Permission-aware memory for AI agents. Deterministic access, governed by lineage, proven by audit. Watch the 60s reel, play the library, verify in the console, go deep in the repo." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.31.0/tabler-icons.min.css">
+<style>
+  :root{
+    --ink:#090D14; --panel:#121826; --panel2:#0E1420; --raise:#182032;
+    --line:#223047; --line-soft:#1a2537;
+    --text:#EEF2F9; --muted:#8A99B0; --faint:#586780;
+    --pub:#38BDA0; --int:#E0A23B; --conf:#E5484D; --violet:#8B7CF0;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+    --disp:'Space Grotesk',system-ui,sans-serif; --body:'Inter',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box} html,body{margin:0}
+  body{background:radial-gradient(1200px 700px at 75% -12%,rgba(139,124,240,.12),transparent 60%),radial-gradient(900px 600px at -10% 110%,rgba(56,189,160,.08),transparent 55%),var(--ink);color:var(--text);font-family:var(--body);-webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:48px 22px 60px}
+
+  header{text-align:center;padding:20px 0 8px}
+  .kick{font-family:var(--mono);font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
+  h1{font-family:var(--disp);font-weight:600;font-size:44px;letter-spacing:-.02em;margin:14px 0 0;display:flex;gap:16px;align-items:center;justify-content:center}
+  .onion{font-size:44px;filter:drop-shadow(0 0 22px rgba(139,124,240,.5))}
+  .one{font-family:var(--disp);font-weight:500;font-size:20px;color:var(--muted);margin:16px auto 0;max-width:40ch}
+  .one b{color:var(--text);font-weight:500}
+  .tags{margin:20px 0 6px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  .tag{font-family:var(--mono);font-size:11.5px;color:var(--violet);border:1px solid rgba(139,124,240,.4);background:rgba(139,124,240,.08);border-radius:20px;padding:6px 12px}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:30px 0 8px}
+  .stat{border:1px solid var(--line);background:linear-gradient(180deg,var(--panel),var(--panel2));border-radius:12px;padding:14px 12px;text-align:center}
+  .stat .v{font-family:var(--disp);font-weight:600;font-size:24px}
+  .stat .v.p{color:var(--pub)} .stat .v.v{color:var(--violet)}
+  .stat .k{font-family:var(--mono);font-size:10px;letter-spacing:.04em;color:var(--muted);margin-top:5px}
+
+  .lede{text-align:center;color:var(--muted);font-size:15px;margin:34px auto 20px;max-width:60ch}
+  .lede b{color:var(--text);font-weight:500}
+  h2{font-family:var(--disp);font-weight:600;font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);text-align:center;margin:8px 0 18px}
+
+  .steps{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .card{display:flex;flex-direction:column;border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:20px;text-decoration:none;color:inherit;transition:.16s;position:relative;overflow:hidden}
+  .card:hover{border-color:var(--violet);transform:translateY(-2px)}
+  .card .num{font-family:var(--mono);font-size:12px;color:var(--faint);letter-spacing:.1em}
+  .card .ic{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:22px;margin:10px 0 12px}
+  .ic.watch{background:rgba(139,124,240,.14);color:var(--violet)}
+  .ic.play{background:rgba(56,189,160,.13);color:var(--pub)}
+  .ic.verify{background:rgba(224,162,59,.13);color:var(--int)}
+  .ic.deep{background:rgba(229,72,77,.13);color:var(--conf)}
+  .card .t{font-family:var(--disp);font-weight:600;font-size:19px}
+  .card .d{color:var(--muted);font-size:13.5px;margin-top:7px;flex:1}
+  .card .go{font-family:var(--mono);font-size:12px;color:var(--violet);margin-top:14px;display:flex;align-items:center;gap:6px}
+
+  footer{margin-top:34px;text-align:center;border-top:1px solid var(--line);padding-top:22px}
+  .close{font-family:var(--disp);font-weight:600;font-size:20px}
+  .q{font-family:var(--mono);font-size:14px;color:var(--violet);margin-top:10px}
+  .links{margin-top:16px;font-family:var(--mono);font-size:13px}
+  .links a{color:var(--muted);text-decoration:none;margin:0 8px}
+  .links a:hover{color:var(--violet)}
+  .note{font-family:var(--mono);font-size:11.5px;color:var(--faint);text-align:center;margin-top:24px}
+
+  @media (max-width:720px){ .stats{grid-template-columns:repeat(2,1fr)} .steps{grid-template-columns:1fr} h1{font-size:34px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="kick">BasedAI · Permission-Aware Memory Challenge</div>
+    <h1><span class="onion">🧅</span> Onion Loop Memory Guard</h1>
+    <div class="one">Permission-aware memory for AI agents. Access is <b>computed from lineage</b> — never decided by an LLM.</div>
+    <div class="tags"><span class="tag">retrieval-layer enforcement</span><span class="tag">0 LLM on the decision path</span><span class="tag">revocation by lineage</span><span class="tag">hash-chained audit</span></div>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><div class="v p">0</div><div class="k">LLM calls · decision path</div></div>
+    <div class="stat"><div class="v v">0.38µs</div><div class="k">P99 · 500,000× under budget</div></div>
+    <div class="stat"><div class="v p">39</div><div class="k">tests · 0 dependencies</div></div>
+    <div class="stat"><div class="v v">12k+</div><div class="k">concurrent reads · 0 stale</div></div>
+  </div>
+
+  <p class="lede"><b>The problem:</b> AI agents remember everything a company owns — but their memory has no permissions, so a summary of a confidential deck answers a contractor's question. <b>The fix:</b> revoke the source, and every summary of it vanishes — for everyone, instantly. Here's the whole thing, in four steps.</p>
+
+  <h2>See it in 4 steps</h2>
+  <div class="steps">
+    <a class="card" href="web/reel.html">
+      <span class="num">01 · 60 seconds</span>
+      <div class="ic watch"><i class="ti ti-player-play" aria-hidden="true"></i></div>
+      <div class="t">Watch the reel</div>
+      <div class="d">The whole idea, auto-playing. Revoke a source → its AI summaries vanish for everyone → the audit proves why. Press play.</div>
+      <div class="go">watch <i class="ti ti-arrow-right"></i></div>
+    </a>
+    <a class="card" href="web/library.html">
+      <span class="num">02 · the intuition</span>
+      <div class="ic play"><i class="ti ti-books" aria-hidden="true"></i></div>
+      <div class="t">Play the library</div>
+      <div class="d">The concept as books: public and board-only shelves, an AI summary that inherits its sources' rules. Shred a book, watch it cascade.</div>
+      <div class="go">play <i class="ti ti-arrow-right"></i></div>
+    </a>
+    <a class="card" href="web/index.html">
+      <span class="num">03 · the real engine</span>
+      <div class="ic verify"><i class="ti ti-adjustments" aria-hidden="true"></i></div>
+      <div class="t">Verify in the console</div>
+      <div class="d">Four personas, live revocation, temporal unlock, a hash-chained audit ledger. Everything the reel showed — hands-on, deterministic.</div>
+      <div class="go">open <i class="ti ti-arrow-right"></i></div>
+    </a>
+    <a class="card" href="https://github.com/phoenicon/onion-loop-memory-guard">
+      <span class="num">04 · go deep</span>
+      <div class="ic deep"><i class="ti ti-code" aria-hidden="true"></i></div>
+      <div class="t">Read the source</div>
+      <div class="d">One dependency-free engine, 39 tests, a P99 benchmark, mermaid architecture, an honest security model — and the slide deck. Verify every claim.</div>
+      <div class="go">github <i class="ti ti-arrow-right"></i></div>
+    </a>
+  </div>
+
+  <p class="note">Short on time? <b style="color:var(--muted)">Watch 01</b>, then skim the repo. New to the idea? <b style="color:var(--muted)">Follow 01 → 04.</b></p>
+
+  <footer>
+    <div class="close">Not a chatbot. Not a wrapper.</div>
+    <div class="one" style="font-size:17px;margin-top:4px">A deterministic governance layer for agent memory.</div>
+    <div class="q">&ldquo;verify me — don&apos;t trust me&rdquo;</div>
+    <div class="links">
+      <a href="web/reel.html">reel</a>·<a href="web/library.html">library</a>·<a href="web/index.html">console</a>·<a href="https://github.com/phoenicon/onion-loop-memory-guard">source</a>·<a href="docs/Onion-Loop-Memory-Guard-deck.pptx">deck</a>
+    </div>
+  </footer>
+</div>
+</body>
+</html>

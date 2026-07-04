@@ -163,7 +163,7 @@ const server = createServer(async (req, res) => {
   if (p === '/api/retrieve') return retrieve(res, url.searchParams.get('as') || world.defaultPersona);
   if (p === '/api/search') return search(res, url.searchParams.get('as') || 'carol', url.searchParams.get('q') || '');
   if (p === '/api/audit') return audit(res);
-  return serveStatic(res, p === '/' ? '/web/index.html' : p);
+  return serveStatic(res, p === '/' ? '/index.html' : p);
 });
 
 server.listen(PORT, () => {

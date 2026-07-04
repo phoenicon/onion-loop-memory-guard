@@ -10,7 +10,7 @@
 
 Built for the **BasedAI Permission-Aware Memory Challenge** — *UK AI Agent Hackathon Ep5 × Conduct*
 
-**▶ Live, no install:** [📚 the library](https://phoenicon.github.io/onion-loop-memory-guard/web/library.html) · [🎛️ the console](https://phoenicon.github.io/onion-loop-memory-guard/web/index.html) · [🎬 60s reel](https://phoenicon.github.io/onion-loop-memory-guard/web/reel.html)
+**▶ [Start here — the live hub](https://phoenicon.github.io/onion-loop-memory-guard/)** · or jump to [📚 library](https://phoenicon.github.io/onion-loop-memory-guard/web/library.html) · [🎛️ console](https://phoenicon.github.io/onion-loop-memory-guard/web/index.html) · [🎬 60s reel](https://phoenicon.github.io/onion-loop-memory-guard/web/reel.html)
 
 </div>
 
